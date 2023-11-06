@@ -28,6 +28,14 @@ addopts = [
 ]
 asyncio_mode = "auto"
 
+[[tool.mypy.overrides]]
+module = [
+    "requests",
+    "requests.adapters",
+    "urllib3"
+]
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
