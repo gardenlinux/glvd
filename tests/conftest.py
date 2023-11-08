@@ -6,7 +6,10 @@ import asyncio
 import uuid
 
 from sqlalchemy import event
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import (
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.sql import text
 
 from glvd.database import Base
@@ -62,3 +65,15 @@ async def db_conn(db_engine):
     async with db_engine.begin() as conn:
         yield conn
         await conn.rollback()
+
+
+@pytest.fixture
+async def db_session(db_engine):
+    '''
+    Provides an asynchronous SQLAlchemy database session.
+
+    This should never be commited, or it will affect other tests.
+    '''
+    async with async_sessionmaker(db_engine)() as session:
+        yield session
+        await session.rollback()
