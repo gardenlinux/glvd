@@ -13,6 +13,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.11"
 asyncpg = ">=0.28"
+quart = ">=0.18"
 requests = ">=2"
 SQLAlchemy = "^2"
 

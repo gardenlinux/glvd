@@ -23,7 +23,7 @@ Otherwise install them into the main system.
 This requires Debian experimental for now.
 
 ```
-sudo apt satisfy 'flake8, mypy, python3-asyncpg, python3-requests, python3-sqlalchemy (>= 2), python3-pytest, python3-pytest-asyncio, python3-requests-mock'
+sudo apt satisfy 'flake8, mypy, python3-asyncpg, python3-quart, python3-requests, python3-sqlalchemy (>= 2), python3-pytest, python3-pytest-asyncio, python3-requests-mock'
 ```
 
 ## Run tests
@@ -32,4 +32,10 @@ sudo apt satisfy 'flake8, mypy, python3-asyncpg, python3-requests, python3-sqlal
 PYTHONPATH=src pytest
 flake8
 mypy .
+```
+
+## Run web interface
+
+```
+PYTHONPATH=src quart --app glvd.web run
 ```
