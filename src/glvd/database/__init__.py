@@ -82,3 +82,20 @@ class DebsecCve(Base):
         self.deb_version_fixed = other.deb_version_fixed
         self.debsec_tag = other.debsec_tag
         self.debsec_note = other.debsec_note
+
+
+class DebCve(Base):
+    __tablename__ = 'deb_cve'
+
+    dist_id = mapped_column(ForeignKey(DistCpe.id), primary_key=True)
+    cve_id: Mapped[str] = mapped_column(primary_key=True)
+    last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
+    deb_source: Mapped[str] = mapped_column(primary_key=True)
+    deb_version: Mapped[str]
+    debsec_vulnerable: Mapped[bool]
+
+    dist: Mapped[Optional[DistCpe]] = relationship(lazy='selectin', default=None)
+
+    def merge(self, other: Self) -> None:
+        self.deb_version = other.deb_version
+        self.debsec_vulnerable = other.debsec_vulnerable
