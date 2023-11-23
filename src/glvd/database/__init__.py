@@ -93,9 +93,11 @@ class DebCve(Base):
     deb_source: Mapped[str] = mapped_column(primary_key=True)
     deb_version: Mapped[str]
     debsec_vulnerable: Mapped[bool]
+    data_cpe_match: Mapped[Any]
 
     dist: Mapped[Optional[DistCpe]] = relationship(lazy='selectin', default=None)
 
     def merge(self, other: Self) -> None:
         self.deb_version = other.deb_version
         self.debsec_vulnerable = other.debsec_vulnerable
+        self.data_cpe_match = other.data_cpe_match
