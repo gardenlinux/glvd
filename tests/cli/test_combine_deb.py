@@ -44,7 +44,7 @@ class TestIngestDebsrc:
         assert t.deb_version == '1'
         assert t.debsec_vulnerable is False
         assert t.data_cpe_match == {
-            'criteria': 'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:*',
+            'criteria': r'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:deb_source\=test\,deb_version\=1',
             'vulnerable': False,
         }
 
@@ -67,7 +67,7 @@ class TestIngestDebsrc:
         assert t.deb_version == '1'
         assert t.debsec_vulnerable is True
         assert t.data_cpe_match == {
-            'criteria': 'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:*',
+            'criteria': r'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:deb_source\=test\,deb_version\=1',
             'vulnerable': True,
         }
 
@@ -91,7 +91,7 @@ class TestIngestDebsrc:
         assert t.deb_version == '1'
         assert t.debsec_vulnerable is False
         assert t.data_cpe_match == {
-            'criteria': 'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:*',
+            'criteria': r'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:deb_source\=test\,deb_version\=1',
             'vulnerable': False,
         }
 
@@ -115,6 +115,6 @@ class TestIngestDebsrc:
         assert t.deb_version == '1'
         assert t.debsec_vulnerable is True
         assert t.data_cpe_match == {
-            'criteria': 'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:*',
+            'criteria': r'cpe:2.3:o:debian:debian_linux:13:*:*:*:*:*:*:deb_source\=test\,deb_version\=1',
             'vulnerable': True,
         }
