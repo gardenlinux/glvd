@@ -16,69 +16,17 @@ from sqlalchemy.ext.asyncio import (
 
 from ..database import Base, DistCpe, Debsrc
 from ..data.debsrc import DebsrcFile
+from ..data.dist_cpe import DistCpeMapper
 
 
 logger = logging.getLogger(__name__)
 
 
 class IngestDebsrc:
-    class DistCpeMapper:
-        cpe_vendor: str
-        cpe_product: str
-
-        def __call__(self, codename: str) -> DistCpe:
-            raise NotImplementedError
-
-    # XXX: Move mapper somewhere else
-    class DistCpeMapperDebian(DistCpeMapper):
-        cpe_vendor = 'debian'
-        cpe_product = 'debian_linux'
-
-        def __call__(self, codename: str) -> DistCpe:
-            version: str = {
-                'woody': '3.0',
-                'sarge': '3.1',
-                'etch': '4.0',
-                'lenny': '5.0',
-                'squeeze': '6.0',
-                'wheezy': '7',
-                'jessie': '8',
-                'stretch': '9',
-                'buster': '10',
-                'bullseye': '11',
-                'bookworm': '12',
-                'trixie': '13',
-                'forky': '14',
-                '': '',
-            }[codename]
-            return DistCpe(
-                cpe_vendor='debian',
-                cpe_product='debian_linux',
-                cpe_version=version,
-                deb_codename=codename,
-            )
-
-    class DistCpeMapperGardenlinux(DistCpeMapper):
-        cpe_vendor = 'sap'
-        cpe_product = 'gardenlinux'
-
-        def __call__(self, codename: str) -> DistCpe:
-            return DistCpe(
-                cpe_vendor='sap',
-                cpe_product='gardenlinux',
-                cpe_version=codename,
-                deb_codename=codename,
-            )
-
-    dist_cpe_mapper: dict[str, DistCpeMapper] = {
-        'debian': DistCpeMapperDebian(),
-        'gardenlinux': DistCpeMapperGardenlinux(),
-    }
-
     def __init__(self, cpe_product: str, deb_codename: str, file: Path) -> None:
         self.file = file
 
-        self.dist = self.dist_cpe_mapper[cpe_product](deb_codename)
+        self.dist = DistCpeMapper.new(cpe_product)(deb_codename)
 
     def read(self) -> DebsrcFile:
         r = DebsrcFile()
@@ -160,8 +108,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'cpe_product',
-        choices=sorted(IngestDebsrc.dist_cpe_mapper.keys()),
-        help=f'CPE product used for data, supported: {" ".join(sorted(IngestDebsrc.dist_cpe_mapper.keys()))}',
+        choices=sorted(DistCpeMapper.keys()),
+        help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
         metavar='CPE_PRODUCT',
     )
     parser.add_argument(
