@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ..database import Base, DistCpe, DebCve
+from ..data.cpe import Cpe
 
 
 logger = logging.getLogger(__name__)
@@ -116,12 +117,25 @@ class CombineDeb:
             }):
                 cve_id, deb_source, deb_version, debsec_vulnerable = r
 
+                cpe = Cpe(
+                    part=Cpe.PART.OS,
+                    vendor=dist.cpe_vendor,
+                    product=dist.cpe_product,
+                    version=dist.cpe_version,
+                )
+
+                cpe_match = {
+                    'criteria': str(cpe),
+                    'vulnerable': debsec_vulnerable,
+                }
+
                 new_entries[(cve_id, deb_source)] = DebCve(
                     dist=dist,
                     cve_id=cve_id,
                     deb_source=deb_source,
                     deb_version=deb_version,
                     debsec_vulnerable=debsec_vulnerable,
+                    data_cpe_match=cpe_match,
                 )
 
             await self.combine_update(session, dist, new_entries)
