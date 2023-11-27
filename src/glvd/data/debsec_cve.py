@@ -36,8 +36,8 @@ class DebsecCveFile(dict[str, dict[tuple[str, str], DebsecCve]]):
     def _read_source(self, cve_id: str, match: re.Match) -> None:
         per_codename = self.setdefault(match['codename'] or '', {})
 
-        # We don't care if a package does not exist
-        if (tag := match['tag']) == 'removed':
+        # We don't care if a package does not exist or is not affected
+        if (tag := match['tag']) in ('removed', 'not-affected'):
             return
 
         per_codename[cve_id, match['source']] = DebsecCve(
