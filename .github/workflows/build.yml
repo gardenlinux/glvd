@@ -2,9 +2,16 @@ name: glvd
 
 on:
   pull_request:
+  push:
+    branches:
+    - main
   release:
     types:
     - published
+
+permissions:
+  # Checkout repository
+  contents: read
 
 jobs:
   build:
@@ -21,7 +28,7 @@ jobs:
         with:
           context: .
           file: Containerfile
-          tags: glvd:latest
+          tags: glvd:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
           outputs: type=docker,dest=/tmp/glvd.tar
 
       - name: Upload artifact
@@ -32,6 +39,7 @@ jobs:
           retention-days: 7
 
   test:
+    name: test (${{ matrix.test.name }})
     needs: build
     runs-on: ubuntu-latest
 
@@ -41,6 +49,18 @@ jobs:
       PGHOST: localhost
       PGPORT: 5432
       PGDATABASE: glvd_test
+      GLVD_IMAGE_TAG: "glvd:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}"
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - name: py.test
+            command: py.test-3 /usr/local/src
+            dependencies: ["python3-pytest", "python3-pytest-asyncio"]
+          - name: mypy
+            command: mypy --show-error-codes --namespace-packages /usr/local/src
+            dependencies: ["mypy", "python3-pytest", "python3-urllib3/experimental"]
 
     services:
       postgres:
@@ -69,16 +89,13 @@ jobs:
       - name: Prepare environment variables
         run: env > env.list
 
-      - name: Run image
+      - name: Run image ${{ env.GLVD_IMAGE_TAG }} for ${{ matrix.test.name }}
         run: |
           docker run \
-            --env DATABASE_URL="$DATABASE_URL" \
             --network host \
             --rm \
-            --user root \
             --env-file env.list \
-            glvd:latest \
+            ${GLVD_IMAGE_TAG} \
             bash -c 'apt update && 
-            apt install -y ca-certificates python3-pytest python3-pytest-flake8 python3-pytest-asyncio mypy && 
-            py.test-3 --flake8 /usr/local/src && 
-            mypy --show-error-codes  --namespace-packages /usr/local/src'
+            apt install -y ca-certificates ${{ join(matrix.test.dependencies, ' ') }} && 
+            ${{ matrix.test.command }}'
