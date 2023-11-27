@@ -51,6 +51,20 @@ class DistCpe(Base):
     deb_codename: Mapped[str]
 
 
+class Debsrc(Base):
+    __tablename__ = 'debsrc'
+
+    dist_id = mapped_column(ForeignKey(DistCpe.id), primary_key=True)
+    last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
+    deb_source: Mapped[str] = mapped_column(primary_key=True)
+    deb_version: Mapped[str]
+
+    dist: Mapped[Optional[DistCpe]] = relationship(lazy='selectin', default=None)
+
+    def merge(self, other: Self) -> None:
+        self.deb_version = other.deb_version
+
+
 class DebsecCve(Base):
     __tablename__ = 'debsec_cve'
 
