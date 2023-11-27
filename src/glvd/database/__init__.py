@@ -24,6 +24,8 @@ from sqlalchemy.types import (
 )
 from sqlalchemy.dialects.postgresql import JSONB
 
+from .types import DebVersion
+
 
 class Base(MappedAsDataclass, DeclarativeBase):
     type_annotation_map = {
@@ -57,7 +59,7 @@ class Debsrc(Base):
     dist_id = mapped_column(ForeignKey(DistCpe.id), primary_key=True)
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
     deb_source: Mapped[str] = mapped_column(primary_key=True)
-    deb_version: Mapped[str]
+    deb_version: Mapped[str] = mapped_column(DebVersion)
 
     dist: Mapped[Optional[DistCpe]] = relationship(lazy='selectin', default=None)
 
@@ -72,7 +74,7 @@ class DebsecCve(Base):
     cve_id: Mapped[str] = mapped_column(primary_key=True)
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
     deb_source: Mapped[str] = mapped_column(primary_key=True)
-    deb_version_fixed: Mapped[Optional[str]] = mapped_column(default=None)
+    deb_version_fixed: Mapped[Optional[str]] = mapped_column(DebVersion, default=None)
     debsec_tag: Mapped[Optional[str]] = mapped_column(default=None)
     debsec_note: Mapped[Optional[str]] = mapped_column(default=None)
 
@@ -91,7 +93,7 @@ class DebCve(Base):
     cve_id: Mapped[str] = mapped_column(primary_key=True)
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
     deb_source: Mapped[str] = mapped_column(primary_key=True)
-    deb_version: Mapped[str]
+    deb_version: Mapped[str] = mapped_column(DebVersion)
     debsec_vulnerable: Mapped[bool]
     data_cpe_match: Mapped[Any]
 

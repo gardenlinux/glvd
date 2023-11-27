@@ -10,8 +10,8 @@ The database needs to accessible using the default means, so `psql` should work 
 
 This should work on current Debian:
 ```
-sudo apt install postgresql-16
-sudo -u postgres psql -c "CREATE USER ${USER}; CREATE DATABASE ${USER} OWNER ${USER};"
+sudo apt install postgresql-16 postgresql-16-debversion
+sudo -u postgres psql -c "CREATE USER ${USER}; CREATE DATABASE ${USER} OWNER ${USER}; CREATE EXTENSION debversion;"
 ```
 
 ## Preparing dependencies
