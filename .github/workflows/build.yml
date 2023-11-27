@@ -1,4 +1,4 @@
-name: Test
+name: glvd
 
 on:
   pull_request:
@@ -71,6 +71,6 @@ jobs:
             --user root \
             glvd:latest \
             bash -c 'apt update && 
-            apt install -y ca-certificates python3-pytest python3-pytest-flake8 mypy && 
+            apt install -y ca-certificates python3-pytest python3-pytest-flake8 python3-pytest-asyncio mypy && 
             py.test-3 --flake8 /usr/local/src && 
             mypy --show-error-codes  --namespace-packages /usr/local/src'
