@@ -4,6 +4,7 @@ import pytest
 
 import asyncio
 import uuid
+from unittest.mock import Mock
 
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
@@ -13,6 +14,12 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.sql import text
 
 from glvd.database import Base
+
+
+# Use standard types in all tests.  Extra types needs to be installed and
+# require superuser privileges.
+import glvd.database.types
+setattr(glvd.database.types.DebVersion, 'get_col_spec', Mock(return_value='text'))
 
 
 # Override with broader scope, so we can use session fixtures
