@@ -36,7 +36,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgres://user:password@localhost:5432/glvd_test
+      PGUSER: user
+      PGPASSWORD: password
+      PGHOST: localhost
+      PGPORT: 5432
+      PGDATABASE: glvd_test
 
     services:
       postgres:
@@ -62,6 +66,9 @@ jobs:
         run: |
           docker load --input /tmp/glvd.tar
 
+      - name: Prepare environment variables
+        run: env > env.list
+
       - name: Run image
         run: |
           docker run \
@@ -69,6 +76,7 @@ jobs:
             --network host \
             --rm \
             --user root \
+            --env-file env.list \
             glvd:latest \
             bash -c 'apt update && 
             apt install -y ca-certificates python3-pytest python3-pytest-flake8 python3-pytest-asyncio mypy && 
