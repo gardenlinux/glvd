@@ -1,0 +1,73 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+permissions:
+  # Checkout repository
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: glvd_test
+          POSTGRES_PASSWORD: password
+        ports:
+        - 5432:5432
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        file: Containerfile
+        load: true
+
+    - name: Run flake8
+      if: ${{ always() }}
+      run: >
+        docker run
+        --network host
+        --rm
+        --entrypoint ''
+        --workdir /usr/local/src
+        ${{ steps.build.outputs.imageid }}
+        /bin/sh -c 'apt-get install -y flake8 && flake8'
+
+    - name: Run py.test
+      if: ${{ always() }}
+      run: >
+        docker run
+        --network host
+        --rm
+        --entrypoint ''
+        --workdir /usr/local/src
+        --env PGUSER=glvd_test
+        --env PGPASSWORD=password
+        ${{ steps.build.outputs.imageid }}
+        /bin/sh -c 'apt-get install -y python3-pytest python3-pytest-asyncio python3-requests-mock && py.test'
+
+    - name: Run mypy
+      if: ${{ always() }}
+      run: >
+        docker run
+        --network host
+        --rm
+        --entrypoint ''
+        --workdir /usr/local/src
+        ${{ steps.build.outputs.imageid }}
+        /bin/sh -c 'apt-get install -y mypy python3-pytest && mypy --show-error-codes .'
