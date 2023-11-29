@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ..database import Base, DistCpe, DebCve
-from ..data.cpe import Cpe
+from ..data.cpe import Cpe, CpeOtherDebian
 
 
 logger = logging.getLogger(__name__)
@@ -122,6 +122,10 @@ class CombineDeb:
                     vendor=dist.cpe_vendor,
                     product=dist.cpe_product,
                     version=dist.cpe_version,
+                    other=CpeOtherDebian(
+                        deb_source=deb_source,
+                        deb_version=deb_version,
+                    ),
                 )
 
                 cpe_match = {
