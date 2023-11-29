@@ -52,10 +52,11 @@ class IngestDebsec:
 
             new_entries = file_cve.get(entry.dist.deb_codename)
             if not new_entries:
+                await session.delete(entry)
                 continue
             new_entry = new_entries.pop((entry.cve_id, entry.deb_source), None)
             if not new_entry:
-                # XXX: Delete entry
+                await session.delete(entry)
                 continue
 
             # Update object in place. Only real changes will be commited

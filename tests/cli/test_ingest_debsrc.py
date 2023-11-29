@@ -62,3 +62,20 @@ class TestIngestDebsrc:
         assert t.dist.cpe_version == '12'
         assert t.deb_source == 'test2'
         assert t.deb_version == '3'
+
+    async def test_import_delete(self, db_session_class):
+        f = DebsrcFile()
+        f['test1'] = Debsrc(
+            deb_source='test1',
+            deb_version='1',
+        )
+
+        ingest = IngestDebsrc('debian', 'bookworm', None)
+        await ingest.import_update(db_session_class, f)
+
+        r = (await db_session_class.execute(select(Debsrc).order_by(Debsrc.deb_source))).all()
+        assert len(r) == 1
+        t = r.pop(0)[0]
+        assert t.dist.cpe_version == '12'
+        assert t.deb_source == 'test1'
+        assert t.deb_version == '1'

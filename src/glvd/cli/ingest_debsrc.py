@@ -53,7 +53,7 @@ class IngestDebsrc:
 
             new_entry = file.pop(entry.deb_source, None)
             if not new_entry:
-                # XXX: Delete entry
+                await session.delete(entry)
                 continue
 
             # Update object in place. Only real changes will be commited
