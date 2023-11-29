@@ -54,8 +54,9 @@ class CombineDeb:
     ) -> AsyncGenerator[tuple[DistCpe, list[DistCpe]], None]:
         stmt = (
             select(DistCpe)
-            # Empty version is a fallback, make sure we see them first
-            .order_by(DistCpe.cpe_version)
+            # Debian and empty version are a fallback, make sure we see them first
+            .order_by((DistCpe.cpe_vendor == 'debian').desc())
+            .order_by((DistCpe.cpe_version == '').desc())
         )
 
         dists_fallback: dict[tuple[str, str], DistCpe] = {}
@@ -69,7 +70,10 @@ class CombineDeb:
                 dists = [entry]
                 if fallback := dists_fallback.get((entry.cpe_vendor, entry.cpe_product)):
                     dists.append(fallback)
-                # XXX: Handle fallback to Debian
+                # XXX: Remove hardcoded values somehow
+                if entry.cpe_product == 'gardenlinux':
+                    if fallback := dists_fallback.get(('debian', 'debian_linux')):
+                        dists.append(fallback)
                 yield entry, dists
 
     async def combine_update(
