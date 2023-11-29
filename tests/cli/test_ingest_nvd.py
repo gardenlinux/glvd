@@ -7,7 +7,7 @@ from glvd.database import NvdCve
 
 
 class TestIngestNvd:
-    async def test_fetch_cve_empty(self, db_conn, requests_mock):
+    async def test_fetch_cve_empty(self, db_session, requests_mock):
         for i in range(2):
             requests_mock.get(
                 f'https://services.nvd.nist.gov/rest/json/cves/2.0/?startIndex={i}',
@@ -41,9 +41,11 @@ class TestIngestNvd:
         )
 
         ingest = IngestNvd(wait=0)
-        await ingest.fetch_cve(db_conn)
+        await ingest.fetch_cve(db_session)
 
-        r = (await db_conn.execute(select(NvdCve).order_by(NvdCve.cve_id))).all()
+        r = (await db_session.execute(select(NvdCve).order_by(NvdCve.cve_id))).all()
         assert len(r) == 2
-        assert r[0].cve_id == 'TEST-0'
-        assert r[1].cve_id == 'TEST-1'
+        t = r.pop(0)[0]
+        assert t.cve_id == 'TEST-0'
+        t = r.pop(0)[0]
+        assert t.cve_id == 'TEST-1'

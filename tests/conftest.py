@@ -63,18 +63,6 @@ async def db_engine():
 
 
 @pytest.fixture
-async def db_conn(db_engine):
-    '''
-    Provides an asynchronous SQLAlchemy database connection.
-
-    This should never be commited, or it will affect other tests.
-    '''
-    async with db_engine.begin() as conn:
-        yield conn
-        await conn.rollback()
-
-
-@pytest.fixture
 async def db_session(db_engine):
     '''
     Provides an asynchronous SQLAlchemy database session.
