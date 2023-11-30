@@ -6,20 +6,60 @@ from sqlalchemy import (
     text,
 )
 
+from ..data.cpe import Cpe
+
 bp = Blueprint('nvd', __name__)
 
 
 # XXX: Can we replace that with a view, which combines data and data_configurations in the database?
-stmt_cve_deb_cve_id = (
+stmt_cve_deb_cpe = (
     text('''
         SELECT
-                nvd_cve.data
-                , array_to_json(array_remove(array_agg(deb_cve.data_cpe_match), NULL)) AS data_cpe_matchess
+                nvd_cve.data,
+                array_to_json(
+                    array_remove(
+                        array_agg(deb_cve.data_cpe_match),
+                        NULL
+                    )
+                ) AS data_cpe_matches
             FROM
                 nvd_cve
                 LEFT OUTER JOIN deb_cve USING (cve_id)
-            WHERE cve_id = :cve_id
-            GROUP BY (nvd_cve.data)
+                INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
+            WHERE
+                dist_cpe.cpe_vendor = :cpe_vendor AND
+                dist_cpe.cpe_product = :cpe_product AND
+                dist_cpe.cpe_version = :cpe_version AND
+                deb_cve.deb_source LIKE :deb_source AND
+                deb_cve.debsec_vulnerable = TRUE
+            GROUP BY
+                nvd_cve.cve_id
+    ''')
+    .bindparams(
+        bindparam('cpe_vendor'),
+        bindparam('cpe_product'),
+        bindparam('cpe_version'),
+        bindparam('deb_source'),
+    )
+)
+
+stmt_cve_deb_cve_id = (
+    text('''
+        SELECT
+                nvd_cve.data,
+                array_to_json(
+                    array_remove(
+                        array_agg(deb_cve.data_cpe_match),
+                        NULL
+                    )
+                ) AS data_cpe_matches
+            FROM
+                nvd_cve
+                LEFT OUTER JOIN deb_cve USING (cve_id)
+            WHERE
+                cve_id = :cve_id
+            GROUP BY
+                nvd_cve.cve_id
     ''')
     .bindparams(
         bindparam('cve_id'),
@@ -29,7 +69,17 @@ stmt_cve_deb_cve_id = (
 
 @bp.route('/rest/json/cves/2.0+deb')
 async def nvd_cve_deb():
-    if cve_id := request.args.get('cveId', type=str):
+    if cpe_name := request.args.get('cpeName', type=str):
+        cpe = Cpe.parse(cpe_name)
+        if not cpe.is_debian:
+            return 'Not Debian related CPE', 400
+        stmt = stmt_cve_deb_cpe.bindparams(
+            cpe_vendor=cpe.vendor,
+            cpe_product=cpe.product,
+            cpe_version=cpe.version,
+            deb_source=cpe.other.deb_source or '%',
+        )
+    elif cve_id := request.args.get('cveId', type=str):
         stmt = stmt_cve_deb_cve_id.bindparams(cve_id=cve_id)
 
     async with current_app.db_begin() as conn:
