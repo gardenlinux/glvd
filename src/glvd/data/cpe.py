@@ -8,11 +8,6 @@ from enum import StrEnum
 from typing import Any
 
 
-class CpeAny:
-    def __repr__(self) -> str:
-        return '<ANY>'
-
-
 class CpePart(StrEnum):
     APPLICATION = 'a'
     OS = 'o'
@@ -25,7 +20,7 @@ class CpeOtherDebian:
     deb_version: str | None = dataclasses.field(default=None)
 
     @classmethod
-    def parse(cls, i: str) -> str | CpeOtherDebian | CpeAny | None:
+    def parse(cls, i: str) -> str | CpeOtherDebian | None:
         try:
             kw: dict[str, str | None] = {}
             for f in i.split(','):
@@ -52,19 +47,18 @@ class CpeOtherDebian:
 
 @dataclasses.dataclass
 class Cpe:
-    ANY = CpeAny()
     PART = CpePart
 
-    part: CpePart | CpeAny | None = dataclasses.field(default=ANY, metadata={'factory': CpePart})
-    vendor: str | CpeAny | None = dataclasses.field(default=ANY)
-    product: str | CpeAny | None = dataclasses.field(default=ANY)
-    version: str | CpeAny | None = dataclasses.field(default=ANY)
-    update: str | CpeAny | None = dataclasses.field(default=ANY)
-    lang: str | CpeAny | None = dataclasses.field(default=ANY)
-    sw_edition: str | CpeAny | None = dataclasses.field(default=ANY)
-    target_sw: str | CpeAny | None = dataclasses.field(default=ANY)
-    target_hw: str | CpeAny | None = dataclasses.field(default=ANY)
-    other: str | CpeOtherDebian | CpeAny | None = dataclasses.field(default=ANY)
+    part: CpePart | None = dataclasses.field(default=None, metadata={'factory': CpePart})
+    vendor: str | None = dataclasses.field(default=None)
+    product: str | None = dataclasses.field(default=None)
+    version: str | None = dataclasses.field(default=None)
+    update: str | None = dataclasses.field(default=None)
+    lang: str | None = dataclasses.field(default=None)
+    sw_edition: str | None = dataclasses.field(default=None)
+    target_sw: str | None = dataclasses.field(default=None)
+    target_hw: str | None = dataclasses.field(default=None)
+    other: str | CpeOtherDebian | None = dataclasses.field(default=None)
     is_debian: bool = dataclasses.field(init=False, default=False)
 
     __re = re.compile(r'''
@@ -104,23 +98,21 @@ class Cpe:
             self.is_debian = True
             if isinstance(self.other, str):
                 self.other = CpeOtherDebian.parse(self.other)
-            elif self.other is self.ANY:
+            elif self.other is None:
                 self.other = CpeOtherDebian()
 
     @classmethod
     def _parse_one(cls, field: dataclasses.Field, v: str, /) -> Any:
-        if v == '-':
+        if v == '*':
             return None
-        elif v == '*':
-            return cls.ANY
         else:
             return field.metadata.get('factory', str)(cls.__re_unquote.sub(r'\1', v))
 
     @classmethod
     def parse(cls, v: str, /) -> Cpe:
         if match := cls.__re.match(v):
-            part: CpePart | CpeAny | None
-            kw: dict[str, str | CpeAny | None] = {}
+            part: CpePart | None
+            kw: dict[str, str | None] = {}
             for field in dataclasses.fields(cls):
                 if field.init:
                     if field.name == 'part':
@@ -136,8 +128,6 @@ class Cpe:
         for field in dataclasses.fields(self):
             j = getattr(self, field.name)
             if j is None:
-                m[field.name] = '-'
-            elif isinstance(j, CpeAny):
                 m[field.name] = '*'
             else:
                 m[field.name] = self.__re_quote.sub(r'\\\1', str(j))
