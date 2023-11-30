@@ -29,7 +29,7 @@ stmt_cve_deb_cpe = (
             WHERE
                 dist_cpe.cpe_vendor = :cpe_vendor AND
                 dist_cpe.cpe_product = :cpe_product AND
-                dist_cpe.cpe_version = :cpe_version AND
+                dist_cpe.cpe_version LIKE :cpe_version AND
                 deb_cve.deb_source LIKE :deb_source AND
                 deb_cve.debsec_vulnerable = TRUE
             GROUP BY
@@ -76,7 +76,7 @@ async def nvd_cve_deb():
         stmt = stmt_cve_deb_cpe.bindparams(
             cpe_vendor=cpe.vendor,
             cpe_product=cpe.product,
-            cpe_version=cpe.version,
+            cpe_version=cpe.version or '%',
             deb_source=cpe.other.deb_source or '%',
         )
     elif cve_id := request.args.get('cveId', type=str):
