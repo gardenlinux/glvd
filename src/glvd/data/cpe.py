@@ -25,28 +25,29 @@ class CpeOtherDebian:
     deb_version: str | None = dataclasses.field(default=None)
 
     @classmethod
-    def parse(cls, cpe: Cpe) -> str | CpeOtherDebian | CpeAny | None:
-        if not (cpe.part, cpe.vendor, cpe.product) in [
-            (CpePart.OS, 'debian', 'debian_linux'),
-            (CpePart.OS, 'sap', 'gardenlinux'),
-        ] or not isinstance(cpe.other, str):
-            return cpe.other
-
+    def parse(cls, i: str) -> str | CpeOtherDebian | CpeAny | None:
         try:
             kw: dict[str, str | None] = {}
-            for f in cpe.other.split(','):
+            for f in i.split(','):
                 k, v = f.split('=', 1)
                 kw[k] = v
             return cls(**kw)
         except ValueError:
-            return cpe.other
+            return cls()
 
     def __str__(self) -> str:
         m: list[str] = []
+        allany: bool = True
+
         for field in dataclasses.fields(self):
             if j := getattr(self, field.name):
                 m.append(f'{field.name}={j}')
-        return ','.join(m)
+                allany = False
+
+        if allany:
+            return '*'
+        else:
+            return ','.join(m)
 
 
 @dataclasses.dataclass
@@ -64,6 +65,7 @@ class Cpe:
     target_sw: str | CpeAny | None = dataclasses.field(default=ANY)
     target_hw: str | CpeAny | None = dataclasses.field(default=ANY)
     other: str | CpeOtherDebian | CpeAny | None = dataclasses.field(default=ANY)
+    is_debian: bool = dataclasses.field(init=False, default=False)
 
     __re = re.compile(r'''
         ^cpe:2.3:
@@ -95,7 +97,15 @@ class Cpe:
     __re_unquote = re.compile(r'''\\([!"#$%&'()+,/:;<=>@[\]^`{|}~])''')
 
     def __post_init__(self) -> None:
-        self.other = CpeOtherDebian.parse(self)
+        if (self.part, self.vendor, self.product) in [
+            (CpePart.OS, 'debian', 'debian_linux'),
+            (CpePart.OS, 'sap', 'gardenlinux'),
+        ]:
+            self.is_debian = True
+            if isinstance(self.other, str):
+                self.other = CpeOtherDebian.parse(self.other)
+            elif self.other is self.ANY:
+                self.other = CpeOtherDebian()
 
     @classmethod
     def _parse_one(cls, field: dataclasses.Field, v: str, /) -> Any:

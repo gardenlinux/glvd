@@ -17,6 +17,7 @@ class TestCpe:
         assert c.target_sw is Cpe.ANY
         assert c.target_hw is Cpe.ANY
         assert c.other is Cpe.ANY
+        assert c.is_debian is False
 
     def test_parse(self):
         s = r'cpe:2.3:h:a:b:c\:\%\*\;c:d:*:-:-:-:*:*'
@@ -32,6 +33,7 @@ class TestCpe:
         assert c.target_sw is None
         assert c.target_hw is Cpe.ANY
         assert c.other is Cpe.ANY
+        assert c.is_debian is False
         assert str(c) == s
 
     def test_debian(self):
@@ -49,4 +51,14 @@ class TestCpe:
         assert c.target_hw is Cpe.ANY
         assert c.other.deb_source == 'hello'
         assert c.other.deb_version == '1'
+        assert c.is_debian is True
+        assert str(c) == s
+
+    def test_debian_any(self):
+        s = r'cpe:2.3:o:debian:debian_linux:12:d:*:*:*:*:*:*'
+        c = Cpe.parse(s)
+
+        assert c.other.deb_source is None
+        assert c.other.deb_version is None
+        assert c.is_debian is True
         assert str(c) == s

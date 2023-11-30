@@ -9,7 +9,10 @@ from typing import (
     Self,
 )
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import (
+    ForeignKey,
+    Index,
+)
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -94,10 +97,20 @@ class DebCve(Base):
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
     deb_source: Mapped[str] = mapped_column(primary_key=True)
     deb_version: Mapped[str] = mapped_column(DebVersion)
-    debsec_vulnerable: Mapped[bool]
+    debsec_vulnerable: Mapped[bool] = mapped_column()
     data_cpe_match: Mapped[Any]
 
     dist: Mapped[Optional[DistCpe]] = relationship(lazy='selectin', default=None)
+
+    __table_args__ = (
+        Index(
+            'deb_cve_search',
+            dist_id,
+            debsec_vulnerable,
+            deb_source,
+            deb_version,
+        ),
+    )
 
     def merge(self, other: Self) -> None:
         self.deb_version = other.deb_version
