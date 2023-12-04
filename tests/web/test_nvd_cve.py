@@ -2,6 +2,8 @@
 
 import pytest
 
+import json
+
 from glvd.database import AllCve
 
 
@@ -26,7 +28,7 @@ class TestNvdCve:
         )
 
         assert resp.status_code == 200
-        assert (await resp.json) == {
+        assert json.loads((await resp.data)) == {
             'format': 'NVD_CVE',
             'version': '2.0+deb',
             'vulnerabilities': [
@@ -47,7 +49,7 @@ class TestNvdCve:
         )
 
         assert resp.status_code == 200
-        assert (await resp.json) == {
+        assert json.loads((await resp.data)) == {
             'format': 'NVD_CVE',
             'version': '2.0+deb',
             'vulnerabilities': []
