@@ -11,20 +11,13 @@ from ..data.cpe import Cpe
 bp = Blueprint('nvd', __name__)
 
 
-# XXX: Can we replace that with a view, which combines data and data_configurations in the database?
 stmt_cve_deb_cpe_version = (
     text('''
         SELECT
-                nvd_cve.data,
-                array_to_json(
-                    array_remove(
-                        array_agg(deb_cve.data_cpe_match),
-                        NULL
-                    )
-                ) AS data_cpe_matches
+                all_cve.data
             FROM
-                nvd_cve
-                LEFT OUTER JOIN deb_cve USING (cve_id)
+                all_cve
+                INNER JOIN deb_cve USING (cve_id)
                 INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
             WHERE
                 dist_cpe.cpe_vendor = :cpe_vendor AND
@@ -35,8 +28,8 @@ stmt_cve_deb_cpe_version = (
                     deb_cve.deb_version_fixed > :deb_version OR
                     deb_cve.deb_version_fixed IS NULL
                 )
-            GROUP BY
-                nvd_cve.cve_id
+            ORDER BY
+                all_cve.cve_id
     ''')
     .bindparams(
         bindparam('cpe_vendor'),
@@ -50,16 +43,10 @@ stmt_cve_deb_cpe_version = (
 stmt_cve_deb_cpe_vulnerable = (
     text('''
         SELECT
-                nvd_cve.data,
-                array_to_json(
-                    array_remove(
-                        array_agg(deb_cve.data_cpe_match),
-                        NULL
-                    )
-                ) AS data_cpe_matches
+                all_cve.data
             FROM
-                nvd_cve
-                LEFT OUTER JOIN deb_cve USING (cve_id)
+                all_cve
+                INNER JOIN deb_cve USING (cve_id)
                 INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
             WHERE
                 dist_cpe.cpe_vendor = :cpe_vendor AND
@@ -67,8 +54,8 @@ stmt_cve_deb_cpe_vulnerable = (
                 dist_cpe.cpe_version LIKE :cpe_version AND
                 deb_cve.deb_source LIKE :deb_source AND
                 deb_cve.debsec_vulnerable = TRUE
-            GROUP BY
-                nvd_cve.cve_id
+            ORDER BY
+                all_cve.cve_id
     ''')
     .bindparams(
         bindparam('cpe_vendor'),
@@ -81,20 +68,13 @@ stmt_cve_deb_cpe_vulnerable = (
 stmt_cve_deb_cve_id = (
     text('''
         SELECT
-                nvd_cve.data,
-                array_to_json(
-                    array_remove(
-                        array_agg(deb_cve.data_cpe_match),
-                        NULL
-                    )
-                ) AS data_cpe_matches
+                all_cve.data
             FROM
-                nvd_cve
-                LEFT OUTER JOIN deb_cve USING (cve_id)
+                all_cve
             WHERE
                 cve_id = :cve_id
             GROUP BY
-                nvd_cve.cve_id
+                all_cve.cve_id
     ''')
     .bindparams(
         bindparam('cve_id'),
@@ -129,17 +109,8 @@ async def nvd_cve_deb():
     async with current_app.db_begin() as conn:
         results = []
         async for r in await conn.stream(stmt):
-            data, data_cpe_matches = r
-            if data_cpe_matches:
-                data.setdefault('configurations', []).append({
-                    'nodes': [{
-                        'cpeMatch': data_cpe_matches,
-                        'negate': False,
-                        'operator': 'OR',
-                    }],
-                })
             results.append({
-                'cve': data,
+                'cve': r[0],
             })
 
         return {
