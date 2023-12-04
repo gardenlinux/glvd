@@ -34,6 +34,7 @@ class CombineDeb:
                     cve.cve_id
                     , src.deb_source
                     , src.deb_version
+                    , cve.deb_version_fixed
                     , COALESCE(src.deb_version < cve.deb_version_fixed, TRUE) AS debsec_vulnerable
                 FROM
                     debsrc as src
@@ -119,29 +120,33 @@ class CombineDeb:
                 'dist_id': dist.id,
                 'dists_fallback_id': [i.id for i in dists_fallback],
             }):
-                cve_id, deb_source, deb_version, debsec_vulnerable = r
+                cve_id, deb_source, deb_version, deb_version_fixed, debsec_vulnerable = r
 
                 cpe = Cpe(
                     part=Cpe.PART.OS,
                     vendor=dist.cpe_vendor,
                     product=dist.cpe_product,
                     version=dist.cpe_version,
-                    other=CpeOtherDebian(
-                        deb_source=deb_source,
-                        deb_version=deb_version,
-                    ),
+                    other=CpeOtherDebian(deb_source=deb_source),
                 )
 
                 cpe_match = {
                     'criteria': str(cpe),
+                    'deb': {
+                        'versionLatest': deb_version,
+                    },
                     'vulnerable': debsec_vulnerable,
                 }
+
+                if deb_version_fixed:
+                    cpe_match['deb']['versionEndExcluding'] = deb_version_fixed
 
                 new_entries[(cve_id, deb_source)] = DebCve(
                     dist=dist,
                     cve_id=cve_id,
                     deb_source=deb_source,
                     deb_version=deb_version,
+                    deb_version_fixed=deb_version_fixed,
                     debsec_vulnerable=debsec_vulnerable,
                     data_cpe_match=cpe_match,
                 )
