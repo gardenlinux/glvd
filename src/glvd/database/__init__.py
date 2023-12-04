@@ -97,6 +97,7 @@ class DebCve(Base):
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
     deb_source: Mapped[str] = mapped_column(primary_key=True)
     deb_version: Mapped[str] = mapped_column(DebVersion)
+    deb_version_fixed: Mapped[Optional[str]] = mapped_column(DebVersion)
     debsec_vulnerable: Mapped[bool] = mapped_column()
     data_cpe_match: Mapped[Any]
 
@@ -114,5 +115,6 @@ class DebCve(Base):
 
     def merge(self, other: Self) -> None:
         self.deb_version = other.deb_version
+        self.deb_version_fixed = other.deb_version_fixed
         self.debsec_vulnerable = other.debsec_vulnerable
         self.data_cpe_match = other.data_cpe_match
