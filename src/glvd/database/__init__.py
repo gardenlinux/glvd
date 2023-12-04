@@ -118,3 +118,14 @@ class DebCve(Base):
         self.deb_version_fixed = other.deb_version_fixed
         self.debsec_vulnerable = other.debsec_vulnerable
         self.data_cpe_match = other.data_cpe_match
+
+
+class AllCve(Base):
+    __tablename__ = 'all_cve'
+
+    cve_id: Mapped[str] = mapped_column(primary_key=True)
+    last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
+    data: Mapped[Any]
+
+    def merge(self, other: Self) -> None:
+        self.data = other.data

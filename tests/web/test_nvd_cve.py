@@ -2,18 +2,15 @@
 
 import pytest
 
-from datetime import datetime
-
-from glvd.database import NvdCve
+from glvd.database import AllCve
 
 
 class TestNvdCve:
     @pytest.fixture(autouse=True, scope='class')
     async def setup_example(self, db_session_class):
         for i in range(2):
-            db_session_class.add(NvdCve(
+            db_session_class.add(AllCve(
                 cve_id=f'TEST-{i}',
-                last_mod=datetime.fromisoformat('2019-04-01T00:00:00'),
                 data={
                     'id': f'TEST-{i}',
                 },
