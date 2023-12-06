@@ -23,9 +23,9 @@ from sqlalchemy.orm import (
 from sqlalchemy.sql import func
 from sqlalchemy.types import (
     DateTime,
+    JSON,
     Text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 
 from .types import DebVersion
 
@@ -34,7 +34,7 @@ class Base(MappedAsDataclass, DeclarativeBase):
     type_annotation_map = {
         str: Text,
         datetime: DateTime(timezone=True),
-        Any: JSONB,
+        Any: JSON,
     }
 
 

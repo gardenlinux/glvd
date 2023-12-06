@@ -13,23 +13,32 @@ bp = Blueprint('nvd', __name__)
 
 stmt_cve_deb_cpe_version = (
     text('''
+        WITH data AS (
+            SELECT
+                    all_cve.data AS cve
+                FROM
+                    all_cve
+                    INNER JOIN deb_cve USING (cve_id)
+                    INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
+                WHERE
+                    dist_cpe.cpe_vendor = :cpe_vendor AND
+                    dist_cpe.cpe_product = :cpe_product AND
+                    dist_cpe.cpe_version LIKE :cpe_version AND
+                    deb_cve.deb_source = :deb_source AND
+                    (
+                        deb_cve.deb_version_fixed > :deb_version OR
+                        deb_cve.deb_version_fixed IS NULL
+                    )
+               ORDER BY
+                    all_cve.cve_id
+            )
         SELECT
-                all_cve.data
-            FROM
-                all_cve
-                INNER JOIN deb_cve USING (cve_id)
-                INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
-            WHERE
-                dist_cpe.cpe_vendor = :cpe_vendor AND
-                dist_cpe.cpe_product = :cpe_product AND
-                dist_cpe.cpe_version LIKE :cpe_version AND
-                deb_cve.deb_source = :deb_source AND
-                (
-                    deb_cve.deb_version_fixed > :deb_version OR
-                    deb_cve.deb_version_fixed IS NULL
-                )
-            ORDER BY
-                all_cve.cve_id
+                json_build_object(
+                    'format', 'NVD_CVE',
+                    'version', '2.0+deb',
+                    'vulnerabilities', coalesce(json_agg(data), '[]'::json)
+                )::text
+            FROM data
     ''')
     .bindparams(
         bindparam('cpe_vendor'),
@@ -42,20 +51,29 @@ stmt_cve_deb_cpe_version = (
 
 stmt_cve_deb_cpe_vulnerable = (
     text('''
+        WITH data AS (
+            SELECT
+                    all_cve.data AS cve
+                FROM
+                    all_cve
+                    INNER JOIN deb_cve USING (cve_id)
+                    INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
+                WHERE
+                    dist_cpe.cpe_vendor = :cpe_vendor AND
+                    dist_cpe.cpe_product = :cpe_product AND
+                    dist_cpe.cpe_version LIKE :cpe_version AND
+                    deb_cve.deb_source LIKE :deb_source AND
+                    deb_cve.debsec_vulnerable = TRUE
+                ORDER BY
+                    all_cve.cve_id
+            )
         SELECT
-                all_cve.data
-            FROM
-                all_cve
-                INNER JOIN deb_cve USING (cve_id)
-                INNER JOIN dist_cpe ON (deb_cve.dist_id = dist_cpe.id)
-            WHERE
-                dist_cpe.cpe_vendor = :cpe_vendor AND
-                dist_cpe.cpe_product = :cpe_product AND
-                dist_cpe.cpe_version LIKE :cpe_version AND
-                deb_cve.deb_source LIKE :deb_source AND
-                deb_cve.debsec_vulnerable = TRUE
-            ORDER BY
-                all_cve.cve_id
+                json_build_object(
+                    'format', 'NVD_CVE',
+                    'version', '2.0+deb',
+                    'vulnerabilities', coalesce(json_agg(data), '[]'::json)
+                )::text
+            FROM data
     ''')
     .bindparams(
         bindparam('cpe_vendor'),
@@ -67,14 +85,23 @@ stmt_cve_deb_cpe_vulnerable = (
 
 stmt_cve_deb_cve_id = (
     text('''
+        WITH data AS (
+            SELECT
+                    all_cve.data AS cve
+                FROM
+                    all_cve
+                WHERE
+                    cve_id = :cve_id
+                GROUP BY
+                    all_cve.cve_id
+            )
         SELECT
-                all_cve.data
-            FROM
-                all_cve
-            WHERE
-                cve_id = :cve_id
-            GROUP BY
-                all_cve.cve_id
+                json_build_object(
+                    'format', 'NVD_CVE',
+                    'version', '2.0+deb',
+                    'vulnerabilities', coalesce(json_agg(data), '[]'::json)
+                )::text
+            FROM data
     ''')
     .bindparams(
         bindparam('cve_id'),
@@ -107,14 +134,7 @@ async def nvd_cve_deb():
         stmt = stmt_cve_deb_cve_id.bindparams(cve_id=cve_id)
 
     async with current_app.db_begin() as conn:
-        results = []
-        async for r in await conn.stream(stmt):
-            results.append({
-                'cve': r[0],
-            })
-
-        return {
-            'format': 'NVD_CVE',
-            'version': '2.0+deb',
-            'vulnerabilities': results,
-        }, 200
+        return (
+            (await conn.execute(stmt)).one()[0],
+            200
+        )
