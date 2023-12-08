@@ -41,7 +41,7 @@ def create_app():
 
     QuartDb(app)
 
-    from .nvd import bp as bp_nvd
-    app.register_blueprint(bp_nvd)
+    from .v1_cves import bp as bp_v1_cves
+    app.register_blueprint(bp_v1_cves)
 
     return app

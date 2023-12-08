@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Garden Linux Vulnerability Database
+  contact:
+    email: gardenlinux@gardenlinux.io
+  license:
+    name: MIT
+  version: 0.1.0
+servers:
+- url: http://localhost:5000/v1
+tags:
+- name: cve
+  description: Everything about CVE
+paths:
+  /cves/findByCpe:
+    get:
+      tags:
+      - cve
+      summary: Finds CVE by CPE
+      parameters:
+      - name: cpeName
+        in: query
+        description: CPE name to search for, only Debian/Garden Linux related CPE can be used
+        required: true
+        schema:
+          type: string
+      - name: cvssV3Severity
+        in: query
+        description: Not implemented
+        schema:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - CRITICAL
+      - name: debVersionEnd
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: parameter is invalid
+  /cves/{cveId}:
+    get:
+      tags:
+        - cve
+      summary: Find CVE by ID
+      parameters:
+        - name: cveId
+          in: path
+          description: ID of CVE
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json: {}
+        '404':
+          description: CVE not found
