@@ -46,6 +46,47 @@ paths:
               schema: {}
         '400':
           description: parameter is invalid
+  /cves/findBySources:
+    post:
+      tags:
+      - cve
+      summary: Finds CVE by source packages
+      parameters:
+      - name: cvssV3Severity
+        in: query
+        description: Not implemented
+        schema:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - CRITICAL
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                source[]:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - 'debian_bookworm_glibc_2.36-9+deb12u3'
+            encoding:
+              source[]:
+                style: form
+                explode: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: parameter is invalid
   /cves/{cveId}:
     get:
       tags:
