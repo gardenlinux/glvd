@@ -96,14 +96,16 @@ class IngestNvd:
             if not last_mod or last_mod <= start:
                 logger.info('Requesting all data')
                 await self.fetch_cve_impl(conn, rsession, {})
+                last_mod = now
 
-            # Request the last 90 days.  This violates parts the the best
-            # practices documented at
+            # Request seven days before the last modification.  This violates
+            # parts the the best practices documented at
             # https://nvd.nist.gov/developers/start-here#:~:text=Best%20Practices
             # It turns out, we don't work on a stable snapshot, and the
             # modification timestamp changes.
+            check = last_mod - timedelta(days=7)
             params: dict[str, str] = {
-                'lastModStartDate': start.isoformat(),
+                'lastModStartDate': check.isoformat(),
                 'lastModEndDate': now.isoformat(),
             }
 
