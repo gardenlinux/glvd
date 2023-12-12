@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+import pytest
+
 from glvd.data.cpe import Cpe, CpePart
 
 
@@ -18,6 +20,8 @@ class TestCpe:
         assert c.target_hw is None
         assert c.other is None
         assert c.is_debian is False
+        with pytest.raises(TypeError):
+            c.other_debian
 
     def test_parse(self):
         s = r'cpe:2.3:h:a:b:c\:\%\*\;c:d:*:-:-:-:*:*'
@@ -34,6 +38,8 @@ class TestCpe:
         assert c.target_hw is None
         assert c.other is None
         assert c.is_debian is False
+        with pytest.raises(TypeError):
+            c.other_debian
         assert str(c) == s
 
     def test_debian(self):
@@ -49,8 +55,8 @@ class TestCpe:
         assert c.sw_edition is None
         assert c.target_sw is None
         assert c.target_hw is None
-        assert c.other.deb_source == 'hello'
-        assert c.other.deb_version == '1'
+        assert c.other_debian.deb_source == 'hello'
+        assert c.other_debian.deb_version == '1'
         assert c.is_debian is True
         assert str(c) == s
 
@@ -58,7 +64,7 @@ class TestCpe:
         s = r'cpe:2.3:o:debian:debian_linux:12:d:*:*:*:*:*:*'
         c = Cpe.parse(s)
 
-        assert c.other.deb_source is None
-        assert c.other.deb_version is None
+        assert c.other_debian.deb_source is None
+        assert c.other_debian.deb_version is None
         assert c.is_debian is True
         assert str(c) == s
