@@ -5,7 +5,10 @@ from __future__ import annotations
 import dataclasses
 import re
 from enum import StrEnum
-from typing import Any
+from typing import (
+    Any,
+    cast,
+)
 
 
 class CpePart(StrEnum):
@@ -100,6 +103,12 @@ class Cpe:
                 self.other = CpeOtherDebian.parse(self.other)
             elif self.other is None:
                 self.other = CpeOtherDebian()
+
+    @property
+    def other_debian(self) -> CpeOtherDebian:
+        if self.is_debian:
+            return cast(CpeOtherDebian, self.other)
+        raise TypeError('Not debian related CPE')
 
     @classmethod
     def _parse_one(cls, field: dataclasses.Field, v: str, /) -> Any:

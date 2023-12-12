@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+from typing import Any
+
 from quart import Blueprint, current_app, request
 from sqlalchemy import (
     bindparam,
@@ -91,10 +93,10 @@ stmt_cpe_vulnerable = (
 
 
 @bp.route('/<cve_id>')
-async def get_cve_id(cve_id):
+async def get_cve_id(cve_id: str) -> tuple[Any, int]:
     stmt = stmt_cve_id.bindparams(cve_id=cve_id)
 
-    async with current_app.db_begin() as conn:
+    async with getattr(current_app, 'db_begin')() as conn:
         data = (await conn.execute(stmt)).one_or_none()
 
         if data:
@@ -104,19 +106,21 @@ async def get_cve_id(cve_id):
 
 
 @bp.route('/findByCpe')
-async def get_cpe_name():
-    cpe = Cpe.parse(request.args.get('cpeName', type=str))
+async def get_cpe_name() -> tuple[Any, int]:
+    cpe = request.args.get('cpeName', type=Cpe.parse)
     deb_version = request.args.get('debVersionEnd', type=str)
 
+    if cpe is None:
+        return 'No CPE', 400
     if not cpe.is_debian:
         return 'Not Debian related CPE', 400
 
-    if cpe.other.deb_source and deb_version:
+    if cpe.other_debian.deb_source and deb_version:
         stmt = stmt_cpe_version.bindparams(
             cpe_vendor=cpe.vendor,
             cpe_product=cpe.product,
             cpe_version=cpe.version or '%',
-            deb_source=cpe.other.deb_source,
+            deb_source=cpe.other_debian.deb_source,
             deb_version=deb_version,
         )
     else:
@@ -124,10 +128,10 @@ async def get_cpe_name():
             cpe_vendor=cpe.vendor,
             cpe_product=cpe.product,
             cpe_version=cpe.version or '%',
-            deb_source=cpe.other.deb_source or '%',
+            deb_source=cpe.other_debian.deb_source or '%',
         )
 
-    async with current_app.db_begin() as conn:
+    async with getattr(current_app, 'db_begin')() as conn:
         return (
             (await conn.execute(stmt)).one()[0],
             200
