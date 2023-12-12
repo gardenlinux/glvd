@@ -109,7 +109,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     engine = create_async_engine(
         "postgresql+asyncpg:///",
-        echo=True,
     )
     main = CombineDeb()
     asyncio.run(main(engine))

@@ -134,7 +134,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     engine = create_async_engine(
         "postgresql+asyncpg:///",
-        echo=True,
     )
     ingest = IngestDebsec(args.cpe_product, args.dir)
     asyncio.run(ingest(engine))

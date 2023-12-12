@@ -14,7 +14,6 @@ class QuartDb:
         # TODO: Use config
         self.engine = create_async_engine(
             "postgresql+asyncpg:///",
-            echo=True,
             pool_size=50,
             max_overflow=0,
         )

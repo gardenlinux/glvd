@@ -123,7 +123,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     engine = create_async_engine(
         "postgresql+asyncpg:///",
-        # echo=True,
     )
     ingest = IngestNvd()
     asyncio.run(ingest(engine))
