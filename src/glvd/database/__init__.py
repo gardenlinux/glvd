@@ -27,7 +27,11 @@ from sqlalchemy.types import (
     Text,
 )
 
-from .types import DebVersion
+from ..data.cvss import CvssSeverity
+from .types import (
+    CvssSeverityType,
+    DebVersion,
+)
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -35,6 +39,7 @@ class Base(MappedAsDataclass, DeclarativeBase):
         str: Text,
         datetime: DateTime(timezone=True),
         Any: JSON,
+        CvssSeverity: CvssSeverityType,
     }
 
 
@@ -95,6 +100,7 @@ class DebCve(Base):
     dist_id = mapped_column(ForeignKey(DistCpe.id), primary_key=True)
     cve_id: Mapped[str] = mapped_column(primary_key=True)
     last_mod: Mapped[datetime] = mapped_column(init=False, server_default=func.now(), onupdate=func.now())
+    cvss_severity: Mapped[Optional[CvssSeverity]] = mapped_column()
     deb_source: Mapped[str] = mapped_column(primary_key=True)
     deb_version: Mapped[str] = mapped_column(DebVersion)
     deb_version_fixed: Mapped[Optional[str]] = mapped_column(DebVersion)
@@ -114,6 +120,7 @@ class DebCve(Base):
     )
 
     def merge(self, other: Self) -> None:
+        self.cvss_severity = other.cvss_severity
         self.deb_version = other.deb_version
         self.deb_version_fixed = other.deb_version_fixed
         self.debsec_vulnerable = other.debsec_vulnerable

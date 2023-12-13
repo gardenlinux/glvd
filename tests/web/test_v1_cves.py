@@ -55,6 +55,7 @@ class TestCpeName:
         db_session_class.add(self.dist)
         db_session_class.add(DebCve(
             cve_id='TEST-fixed',
+            cvss_severity=None,
             deb_source='test',
             deb_version='1',
             deb_version_fixed='1',
@@ -64,6 +65,7 @@ class TestCpeName:
         ))
         db_session_class.add(DebCve(
             cve_id='TEST-vuln',
+            cvss_severity=None,
             deb_source='test',
             deb_version='1',
             deb_version_fixed='2',

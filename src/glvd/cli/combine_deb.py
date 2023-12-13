@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from typing import (
+    Any,
     AsyncGenerator,
 )
 
@@ -22,6 +23,7 @@ from sqlalchemy.ext.asyncio import (
 
 from ..database import Base, DistCpe, DebCve
 from ..data.cpe import Cpe, CpeOtherDebian
+from ..data.cvss import CvssSeverity
 
 
 logger = logging.getLogger(__name__)
@@ -31,23 +33,41 @@ class CombineDeb:
     stmt_combine_new = (
         text('''
             SELECT
-                    cve.cve_id
-                    , src.deb_source
-                    , src.deb_version
-                    , cve.deb_version_fixed
-                    , COALESCE(src.deb_version < cve.deb_version_fixed, TRUE) AS debsec_vulnerable
+                    debsec_cve.cve_id
+                    , nvd_cve.data
+                    , debsrc.deb_source
+                    , debsrc.deb_version
+                    , debsec_cve.deb_version_fixed
+                    , COALESCE(debsrc.deb_version < debsec_cve.deb_version_fixed, TRUE) AS debsec_vulnerable
+                    , debsec_note
                 FROM
-                    debsrc as src
-                    LEFT OUTER JOIN debsec_cve AS cve ON src.deb_source = cve.deb_source
+                    debsrc
+                    LEFT OUTER JOIN debsec_cve ON debsec_cve.deb_source = debsrc.deb_source
+                    INNER JOIN nvd_cve ON nvd_cve.cve_id = debsec_cve.cve_id
                 WHERE
-                    src.dist_id = :dist_id
-                    AND cve.dist_id = ANY(:dists_fallback_id)
+                    debsrc.dist_id = :dist_id
+                    AND debsec_cve.dist_id = ANY(:dists_fallback_id)
         ''')
         .bindparams(
             bindparam('dist_id'),
             bindparam('dists_fallback_id'),
         )
     )
+
+    def extract_cvss_severity(
+        self,
+        entry: Any,
+    ) -> CvssSeverity | None:
+        if metrics := entry.get('metrics'):
+            for i in ('cvssMetricV31', 'cvssMetricV30'):
+                if metrics_single := metrics.get(i):
+                    metrics_primary = [i for i in metrics_single if i.get('type', None) == 'Primary']
+                    if metrics_primary and (severity := metrics_primary[0].get('cvssData', {}).get('baseSeverity')):
+                        try:
+                            return CvssSeverity[severity]
+                        except KeyError:
+                            return None
+        return None
 
     async def combine_dists(
         self,
@@ -120,7 +140,24 @@ class CombineDeb:
                 'dist_id': dist.id,
                 'dists_fallback_id': [i.id for i in dists_fallback],
             }):
-                cve_id, deb_source, deb_version, deb_version_fixed, debsec_vulnerable = r
+                (
+                    cve_id,
+                    nvd_data,
+                    deb_source,
+                    deb_version,
+                    deb_version_fixed,
+                    debsec_vulnerable,
+                    debsec_note
+                ) = r
+
+                if debsec_note:
+                    debsec_notes = [i.strip() for i in debsec_note.split(';')]
+                else:
+                    debsec_notes = []
+
+                cvss_severity = self.extract_cvss_severity(nvd_data)
+                if 'unimportant' in debsec_notes:
+                    cvss_severity = CvssSeverity.UNIMPORTANT
 
                 cpe = Cpe(
                     part=Cpe.PART.OS,
@@ -138,12 +175,15 @@ class CombineDeb:
                     'vulnerable': debsec_vulnerable,
                 }
 
+                if cvss_severity:
+                    cpe_match['deb']['cvssSeverity'] = cvss_severity.name
                 if deb_version_fixed:
                     cpe_match['deb']['versionEndExcluding'] = deb_version_fixed
 
                 new_entries[(cve_id, deb_source)] = DebCve(
                     dist=dist,
                     cve_id=cve_id,
+                    cvss_severity=cvss_severity,
                     deb_source=deb_source,
                     deb_version=deb_version,
                     deb_version_fixed=deb_version_fixed,
