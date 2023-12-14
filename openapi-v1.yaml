@@ -24,12 +24,12 @@ paths:
         required: true
         schema:
           type: string
-      - name: cvssV3Severity
+      - name: cvssV3SeverityMin
         in: query
-        description: Not implemented
         schema:
           type: string
           enum:
+          - UNIMPORTANT
           - LOW
           - MEDIUM
           - HIGH
@@ -52,12 +52,12 @@ paths:
       - cve
       summary: Finds CVE by source packages
       parameters:
-      - name: cvssV3Severity
+      - name: cvssV3SeverityMin
         in: query
-        description: Not implemented
         schema:
           type: string
           enum:
+          - UNIMPORTANT
           - LOW
           - MEDIUM
           - HIGH

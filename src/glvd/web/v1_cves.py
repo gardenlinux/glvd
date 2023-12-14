@@ -13,8 +13,9 @@ from sqlalchemy import (
 )
 
 from ..database import AllCve, DebCve, DistCpe
-from ..database.types import DebVersion
+from ..database.types import CvssSeverityType, DebVersion
 from ..data.cpe import Cpe
+from ..data.cvss import CvssSeverity
 from ..data.dist_cpe import DistCpeMapper
 
 bp = Blueprint('nvd', __name__, url_prefix='/v1/cves')
@@ -49,6 +50,7 @@ stmt_cpe_version = (
                     dist_cpe.cpe_vendor = :cpe_vendor AND
                     dist_cpe.cpe_product = :cpe_product AND
                     dist_cpe.cpe_version LIKE :cpe_version AND
+                    COALESCE(deb_cve.cvss_severity, 0) >= :cvss_severity_min AND
                     deb_cve.deb_source = :deb_source AND
                     (
                         deb_cve.deb_version_fixed > :deb_version OR
@@ -64,6 +66,7 @@ stmt_cpe_version = (
         bindparam('cpe_vendor'),
         bindparam('cpe_product'),
         bindparam('cpe_version'),
+        bindparam('cvss_severity_min', type_=CvssSeverityType),
         bindparam('deb_source'),
         bindparam('deb_version'),
     )
@@ -82,6 +85,7 @@ stmt_cpe_vulnerable = (
                     dist_cpe.cpe_vendor = :cpe_vendor AND
                     dist_cpe.cpe_product = :cpe_product AND
                     dist_cpe.cpe_version LIKE :cpe_version AND
+                    COALESCE(deb_cve.cvss_severity, 0) >= :cvss_severity_min AND
                     deb_cve.deb_source LIKE :deb_source AND
                     deb_cve.debsec_vulnerable = TRUE
                 ORDER BY
@@ -94,6 +98,7 @@ stmt_cpe_vulnerable = (
         bindparam('cpe_vendor'),
         bindparam('cpe_product'),
         bindparam('cpe_version'),
+        bindparam('cvss_severity_min', type_=CvssSeverityType),
         bindparam('deb_source'),
     )
 )
@@ -126,11 +131,17 @@ async def get_cpe_name() -> tuple[Any, int]:
     if not cpe.is_debian:
         return 'Not Debian related CPE', 400
 
+    cvss_severity_min = (
+        request.args.get('cvssV3SeverityMin', type=CvssSeverity.__getitem__)
+        or CvssSeverity.NONE
+    )
+
     if cpe.other_debian.deb_source and deb_version:
         stmt = stmt_cpe_version.bindparams(
             cpe_vendor=cpe.vendor,
             cpe_product=cpe.product,
             cpe_version=cpe.version or '%',
+            cvss_severity_min=cvss_severity_min,
             deb_source=cpe.other_debian.deb_source,
             deb_version=deb_version,
         )
@@ -139,6 +150,7 @@ async def get_cpe_name() -> tuple[Any, int]:
             cpe_vendor=cpe.vendor,
             cpe_product=cpe.product,
             cpe_version=cpe.version or '%',
+            cvss_severity_min=cvss_severity_min,
             deb_source=cpe.other_debian.deb_source or '%',
         )
 
@@ -154,6 +166,11 @@ async def get_sources() -> tuple[Any, int, dict[str, str]]:
     # Handle pre-flight request to allow CORS
     if request.method == 'OPTIONS':
         return ('', 204, headers_cors)
+
+    if cvss_severity_min := request.args.get('cvssV3SeverityMin', type=CvssSeverity.__getitem__):
+        stmt_cvss_severity_min = DebCve.cvss_severity >= cvss_severity_min
+    else:
+        stmt_cvss_severity_min = sa.true()
 
     async with getattr(current_app, 'db_begin')() as conn:
         # Aggregate by product/codename
@@ -206,6 +223,7 @@ async def get_sources() -> tuple[Any, int, dict[str, str]]:
                         DebCve.deb_version_fixed > subquery_source.c.deb_version,
                         DebCve.deb_version_fixed.is_(None),
                     ),
+                    stmt_cvss_severity_min,
                 )
             )
         ).cte()
