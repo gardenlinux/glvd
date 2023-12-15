@@ -11,6 +11,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
+glvd = 'glvd.cli.client.__main__:main'
 glvd-data = 'glvd.cli.data.__main__:main'
 
 [tool.poetry.dependencies]
