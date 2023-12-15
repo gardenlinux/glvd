@@ -17,12 +17,51 @@ from sqlalchemy.ext.asyncio import (
 from ..database import Base, DistCpe, Debsrc
 from ..data.debsrc import DebsrcFile
 from ..data.dist_cpe import DistCpeMapper
+from . import cli
 
 
 logger = logging.getLogger(__name__)
 
 
 class IngestDebsrc:
+    @staticmethod
+    @cli.register(
+        'ingest-debsrc',
+        arguments=[
+            cli.add_argument(
+                'cpe_product',
+                choices=sorted(DistCpeMapper.keys()),
+                help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
+                metavar='CPE_PRODUCT',
+            ),
+            cli.add_argument(
+                'deb_codename',
+                help='codename of APT archive',
+                metavar='CODENAME',
+            ),
+            cli.add_argument(
+                'file',
+                help='uncompressed Sources file',
+                metavar='SOURCES',
+                type=Path,
+            ),
+            cli.add_argument(
+                '--database',
+                default='postgresql+asyncpg:///',
+                help='the database to use, must use asyncio compatible SQLAlchemy driver',
+            ),
+            cli.add_argument(
+                '--debug',
+                action='store_true',
+                help='enable debug output',
+            ),
+        ]
+    )
+    def run(cpe_product: str, deb_codename: str, file: Path, database: str, debug: bool) -> None:
+        logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
+        engine = create_async_engine(database, echo=debug)
+        asyncio.run(IngestDebsrc(cpe_product, deb_codename, file)(engine))
+
     def __init__(self, cpe_product: str, deb_codename: str, file: Path) -> None:
         self.file = file
 
@@ -103,29 +142,4 @@ class IngestDebsrc:
 
 
 if __name__ == '__main__':
-    import argparse
-    logging.basicConfig(level=logging.DEBUG)
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'cpe_product',
-        choices=sorted(DistCpeMapper.keys()),
-        help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
-        metavar='CPE_PRODUCT',
-    )
-    parser.add_argument(
-        'deb_codename',
-        help='codename of APT archive',
-        metavar='CODENAME',
-    )
-    parser.add_argument(
-        'file',
-        help='uncompressed Sources file',
-        metavar='SOURCES',
-        type=Path,
-    )
-    args = parser.parse_args()
-    engine = create_async_engine(
-        "postgresql+asyncpg:///",
-    )
-    ingest = IngestDebsrc(args.cpe_product, args.deb_codename, args.file)
-    asyncio.run(ingest(engine))
+    IngestDebsrc.run()

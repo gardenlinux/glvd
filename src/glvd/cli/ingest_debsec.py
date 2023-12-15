@@ -17,12 +17,46 @@ from sqlalchemy.ext.asyncio import (
 from ..database import Base, DistCpe, DebsecCve
 from ..data.debsec_cve import DebsecCveFile
 from ..data.dist_cpe import DistCpeMapper
+from . import cli
 
 
 logger = logging.getLogger(__name__)
 
 
 class IngestDebsec:
+    @staticmethod
+    @cli.register(
+        'ingest-debsec',
+        arguments=[
+            cli.add_argument(
+                'cpe_product',
+                choices=sorted(DistCpeMapper.keys()),
+                help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
+                metavar='CPE_PRODUCT',
+            ),
+            cli.add_argument(
+                'dir',
+                help='data directory out of https://salsa.debian.org/security-tracker-team/security-tracker',
+                metavar='DEBSEC',
+                type=Path,
+            ),
+            cli.add_argument(
+                '--database',
+                default='postgresql+asyncpg:///',
+                help='the database to use, must use asyncio compatible SQLAlchemy driver',
+            ),
+            cli.add_argument(
+                '--debug',
+                action='store_true',
+                help='enable debug output',
+            ),
+        ]
+    )
+    def run(cpe_product: str, dir: Path, database: str, debug: bool) -> None:
+        logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
+        engine = create_async_engine(database, echo=debug)
+        asyncio.run(IngestDebsec(cpe_product, dir)(engine))
+
     def __init__(self, cpe_product: str, path: Path) -> None:
         self.path = path
 
@@ -116,24 +150,4 @@ class IngestDebsec:
 
 
 if __name__ == '__main__':
-    import argparse
-    logging.basicConfig(level=logging.DEBUG)
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'cpe_product',
-        choices=sorted(DistCpeMapper.keys()),
-        help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
-        metavar='CPE_PRODUCT',
-    )
-    parser.add_argument(
-        'dir',
-        help='data directory out of https://salsa.debian.org/security-tracker-team/security-tracker',
-        metavar='DEBSEC',
-        type=Path,
-    )
-    args = parser.parse_args()
-    engine = create_async_engine(
-        "postgresql+asyncpg:///",
-    )
-    ingest = IngestDebsec(args.cpe_product, args.dir)
-    asyncio.run(ingest(engine))
+    IngestDebsec.run()
