@@ -24,12 +24,34 @@ from sqlalchemy.ext.asyncio import (
 from ..database import Base, DistCpe, DebCve
 from ..data.cpe import Cpe, CpeOtherDebian
 from ..data.cvss import CvssSeverity
+from . import cli
 
 
 logger = logging.getLogger(__name__)
 
 
 class CombineDeb:
+    @staticmethod
+    @cli.register(
+        'combine-deb',
+        arguments=[
+            cli.add_argument(
+                '--database',
+                default='postgresql+asyncpg:///',
+                help='the database to use, must use asyncio compatible SQLAlchemy driver',
+            ),
+            cli.add_argument(
+                '--debug',
+                action='store_true',
+                help='enable debug output',
+            ),
+        ]
+    )
+    def run(database: str, debug: bool) -> None:
+        logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
+        engine = create_async_engine(database, echo=debug)
+        asyncio.run(CombineDeb()(engine))
+
     stmt_combine_new = (
         text('''
             SELECT
@@ -207,12 +229,4 @@ class CombineDeb:
 
 
 if __name__ == '__main__':
-    import argparse
-    logging.basicConfig(level=logging.DEBUG)
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-    engine = create_async_engine(
-        "postgresql+asyncpg:///",
-    )
-    main = CombineDeb()
-    asyncio.run(main(engine))
+    CombineDeb.run()

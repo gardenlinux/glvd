@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import (
 
 from ..database import Base, NvdCve
 from ..util import requests
+from . import cli
 
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,27 @@ logger = logging.getLogger(__name__)
 
 class IngestNvd:
     wait: int
+
+    @staticmethod
+    @cli.register(
+        'ingest-nvd',
+        arguments=[
+            cli.add_argument(
+                '--database',
+                default='postgresql+asyncpg:///',
+                help='the database to use, must use asyncio compatible SQLAlchemy driver',
+            ),
+            cli.add_argument(
+                '--debug',
+                action='store_true',
+                help='enable debug output',
+            ),
+        ]
+    )
+    def run(database: str, debug: bool) -> None:
+        logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
+        engine = create_async_engine(database, echo=debug)
+        asyncio.run(IngestNvd()(engine))
 
     def __init__(self, *, wait: int = 6) -> None:
         self.wait = wait
@@ -122,9 +144,4 @@ class IngestNvd:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-    engine = create_async_engine(
-        "postgresql+asyncpg:///",
-    )
-    ingest = IngestNvd()
-    asyncio.run(ingest(engine))
+    IngestNvd.run()
