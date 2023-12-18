@@ -21,9 +21,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from ..database import Base, DistCpe, DebCve
-from ..data.cpe import Cpe, CpeOtherDebian
-from ..data.cvss import CvssSeverity
+from glvd.database import Base, DistCpe, DebCve
+from glvd.data.cpe import Cpe, CpeOtherDebian
+from glvd.data.cvss import CvssSeverity
 from . import cli
 
 

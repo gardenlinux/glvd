@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from ..database import Base, AllCve
+from glvd.database import Base, AllCve
 from . import cli
 
 

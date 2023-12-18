@@ -4,7 +4,7 @@ import pytest
 
 from sqlalchemy import select
 
-from glvd.cli.ingest_debsec import IngestDebsec
+from glvd.cli.data.ingest_debsec import IngestDebsec
 from glvd.database import DebsecCve
 from glvd.data.debsec_cve import DebsecCveFile
 
