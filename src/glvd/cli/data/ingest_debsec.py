@@ -28,27 +28,17 @@ class IngestDebsec:
     @cli.register(
         'ingest-debsec',
         arguments=[
-            cli.add_argument(
+            cli.prepare_argument(
                 'cpe_product',
                 choices=sorted(DistCpeMapper.keys()),
                 help=f'CPE product used for data, supported: {" ".join(sorted(DistCpeMapper.keys()))}',
                 metavar='CPE_PRODUCT',
             ),
-            cli.add_argument(
+            cli.prepare_argument(
                 'dir',
                 help='data directory out of https://salsa.debian.org/security-tracker-team/security-tracker',
                 metavar='DEBSEC',
                 type=Path,
-            ),
-            cli.add_argument(
-                '--database',
-                default='postgresql+asyncpg:///',
-                help='the database to use, must use asyncio compatible SQLAlchemy driver',
-            ),
-            cli.add_argument(
-                '--debug',
-                action='store_true',
-                help='enable debug output',
             ),
         ]
     )

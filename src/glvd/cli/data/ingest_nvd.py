@@ -27,21 +27,7 @@ class IngestNvd:
     wait: int
 
     @staticmethod
-    @cli.register(
-        'ingest-nvd',
-        arguments=[
-            cli.add_argument(
-                '--database',
-                default='postgresql+asyncpg:///',
-                help='the database to use, must use asyncio compatible SQLAlchemy driver',
-            ),
-            cli.add_argument(
-                '--debug',
-                action='store_true',
-                help='enable debug output',
-            ),
-        ]
-    )
+    @cli.register('ingest-nvd')
     def run(database: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         engine = create_async_engine(database, echo=debug)
