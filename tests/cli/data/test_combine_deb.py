@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from glvd.cli.combine_deb import CombineDeb
+from glvd.cli.data.combine_deb import CombineDeb
 from glvd.data.cvss import CvssSeverity
 from glvd.data.dist_cpe import DistCpeMapper
 from glvd.database import DistCpe, DebCve, DebsecCve, Debsrc, NvdCve

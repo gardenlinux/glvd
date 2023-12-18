@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from ..database import Base, NvdCve
-from ..util import requests
+from glvd.database import Base, NvdCve
+from glvd.util import requests
 from . import cli
 
 

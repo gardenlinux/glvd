@@ -2,7 +2,7 @@
 
 from sqlalchemy import select
 
-from glvd.cli.ingest_nvd import IngestNvd
+from glvd.cli.data.ingest_nvd import IngestNvd
 from glvd.database import NvdCve
 
 

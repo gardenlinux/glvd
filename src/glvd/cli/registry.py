@@ -16,7 +16,7 @@ class _ActionWrapper:
     kw: dict
 
 
-class Cli:
+class CliRegistry:
     parser: argparse.ArgumentParser
     subparsers: argparse._SubParsersAction
 
@@ -78,6 +78,3 @@ class Cli:
             func(**v)
         else:
             self.parser.print_help()
-
-
-cli = Cli()

@@ -14,9 +14,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from ..database import Base, DistCpe, DebsecCve
-from ..data.debsec_cve import DebsecCveFile
-from ..data.dist_cpe import DistCpeMapper
+from glvd.database import Base, DistCpe, DebsecCve
+from glvd.data.debsec_cve import DebsecCveFile
+from glvd.data.dist_cpe import DistCpeMapper
 from . import cli
 
 

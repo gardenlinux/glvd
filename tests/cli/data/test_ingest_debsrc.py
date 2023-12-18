@@ -4,7 +4,7 @@ import pytest
 
 from sqlalchemy import select
 
-from glvd.cli.ingest_debsrc import IngestDebsrc
+from glvd.cli.data.ingest_debsrc import IngestDebsrc
 from glvd.database import Debsrc
 from glvd.data.debsrc import DebsrcFile
 
