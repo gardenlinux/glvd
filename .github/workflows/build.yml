@@ -41,6 +41,8 @@ jobs:
 
     - name: Run flake8
       if: success() || failure()
+      # flake8 is broken right now: https://bugs.debian.org/1057968
+      continue-on-error: true
       run: >
         docker run
         --network host
