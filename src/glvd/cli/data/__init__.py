@@ -5,7 +5,7 @@ from __future__ import annotations
 from ..registry import CliRegistry
 
 
-cli = CliRegistry()
+cli = CliRegistry('glvd-data')
 
 cli.add_argument(
     '--database',
