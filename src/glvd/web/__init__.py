@@ -3,7 +3,8 @@
 import collections.abc
 import contextlib
 
-from quart import Quart
+from quart import Quart, current_app
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, create_async_engine
 
 
@@ -42,5 +43,28 @@ def create_app():
 
     from .v1_cves import bp as bp_v1_cves
     app.register_blueprint(bp_v1_cves)
+
+    @app.route('/readiness')
+    async def readiness() -> tuple[dict, int]:
+        failed = False
+        status: dict[str, str | dict] = {}
+        try:
+            async with getattr(current_app, 'db_begin')() as conn:
+                (await conn.execute(sa.text('SELECT TRUE'))).one()
+            status['db_check'] = {
+                'status': 'ok',
+            }
+        except Exception:
+            failed = True
+            status['db_check'] = {
+                'status': 'failed',
+            }
+
+        if failed:
+            status['status'] = 'failed'
+            return (status, 503)
+        else:
+            status['status'] = 'ok'
+            return (status, 200)
 
     return app
