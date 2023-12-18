@@ -6,7 +6,6 @@ import argparse
 import dataclasses
 from collections.abc import (
     Callable,
-    Iterable,
 )
 
 
@@ -20,6 +19,8 @@ class CliRegistry:
     parser: argparse.ArgumentParser
     subparsers: argparse._SubParsersAction
 
+    arguments: list[_ActionWrapper]
+
     def __init__(self) -> None:
         self.parser = argparse.ArgumentParser(
             allow_abbrev=False,
@@ -29,14 +30,18 @@ class CliRegistry:
         self.subparsers = self.parser.add_subparsers(
             help='sub-command help',
         )
+        self.arguments = []
 
-    def add_argument(self, *args, **kw) -> _ActionWrapper:
+    def prepare_argument(self, *args, **kw) -> _ActionWrapper:
         return _ActionWrapper(args, kw)
+
+    def add_argument(self, *args, **kw) -> None:
+        self.arguments.append(self.prepare_argument(*args, **kw))
 
     def register(
         self,
         name: str,
-        arguments: Iterable[_ActionWrapper],
+        arguments: list[_ActionWrapper] = [],
         usage: str = '%(prog)s',
         epilog: str | None = None,
     ) -> Callable:
@@ -56,7 +61,7 @@ class CliRegistry:
         )
 
         for p in (parser_main, parser_sub):
-            for w in arguments:
+            for w in arguments + self.arguments:
                 p.add_argument(*w.args, **w.kw)
 
         def wrap(func: Callable) -> Callable:
