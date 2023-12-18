@@ -40,7 +40,7 @@ jobs:
         load: true
 
     - name: Run flake8
-      if: ${{ always() }}
+      if: success() || failure()
       run: >
         docker run
         --network host
@@ -51,7 +51,7 @@ jobs:
         /bin/sh -c 'apt-get install -y flake8 && flake8'
 
     - name: Run py.test
-      if: ${{ always() }}
+      if: success() || failure()
       run: >
         docker run
         --network host
@@ -64,7 +64,7 @@ jobs:
         /bin/sh -c 'apt-get install -y python3-pytest python3-pytest-asyncio python3-requests-mock && py.test'
 
     - name: Run mypy
-      if: ${{ always() }}
+      if: success() || failure()
       run: >
         docker run
         --network host
