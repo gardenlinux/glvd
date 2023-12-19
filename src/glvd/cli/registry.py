@@ -69,7 +69,7 @@ class CliRegistry:
 
             def run() -> None:
                 args = parser_main.parse_args()
-                func(**vars(args))
+                func(argparser=parser_main, **vars(args))
 
             return run
 
@@ -80,6 +80,6 @@ class CliRegistry:
         v = vars(args)
         func = v.pop('func', None)
         if func:
-            func(**v)
+            func(argparser=self.parser, **v)
         else:
             self.parser.print_help()

@@ -28,7 +28,7 @@ class ClientCve:
             ),
         ]
     )
-    def run(cve: str, server: str, debug: bool) -> None:
+    def run(*, argparser: None, cve: str, server: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         ClientCve(server)(cve)
 

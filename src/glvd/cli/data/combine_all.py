@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
-import asyncio
 from sqlalchemy import (
     select,
     text,
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class CombineAll:
     @staticmethod
     @cli.register('combine-all')
-    def run(database: str, debug: bool) -> None:
+    def run(*, argparser: None, database: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         engine = create_async_engine(database, echo=debug)
         asyncio.run(CombineAll()(engine))
