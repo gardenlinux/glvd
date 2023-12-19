@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from pathlib import Path
 
-import asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -47,7 +47,7 @@ class IngestDebsrc:
             ),
         ]
     )
-    def run(cpe_product: str, deb_codename: str, file: Path, database: str, debug: bool) -> None:
+    def run(*, argparser: None, cpe_product: str, deb_codename: str, file: Path, database: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         engine = create_async_engine(database, echo=debug)
         asyncio.run(IngestDebsrc(cpe_product, deb_codename, file)(engine))

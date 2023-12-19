@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-import asyncio
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import (
@@ -28,7 +28,7 @@ class IngestNvd:
 
     @staticmethod
     @cli.register('ingest-nvd')
-    def run(database: str, debug: bool) -> None:
+    def run(*, argparser: None, database: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         engine = create_async_engine(database, echo=debug)
         asyncio.run(IngestNvd()(engine))

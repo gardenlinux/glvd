@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import (
     Any,
     AsyncGenerator,
 )
 
-import asyncio
 from sqlalchemy import (
     bindparam,
     select,
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class CombineDeb:
     @staticmethod
     @cli.register('combine-deb')
-    def run(database: str, debug: bool) -> None:
+    def run(*, argparser: None, database: str, debug: bool) -> None:
         logging.basicConfig(level=debug and logging.DEBUG or logging.INFO)
         engine = create_async_engine(database, echo=debug)
         asyncio.run(CombineDeb()(engine))
