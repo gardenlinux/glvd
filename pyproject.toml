@@ -35,6 +35,7 @@ asyncio_mode = "auto"
 
 [[tool.mypy.overrides]]
 module = [
+    "apt",
     "requests",
     "requests.adapters",
     "urllib3"

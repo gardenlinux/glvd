@@ -184,22 +184,27 @@ async def get_sources() -> tuple[Any, int, dict[str, str]]:
         # can remove the enormous time spent on compiling queries
         stmts_source = []
         for i, j in source_by_dist.items():
-            dist = DistCpeMapper.new(i[0])(i[1])
-            dist_id = (await conn.execute(
-                sa.select(DistCpe.id)
-                .where(DistCpe.cpe_vendor == dist.cpe_vendor)
-                .where(DistCpe.cpe_product == dist.cpe_product)
-                .where(DistCpe.cpe_version == dist.cpe_version)
-            )).one()[0]
+            try:
+                dist = DistCpeMapper.new(i[0].lower())(i[1].lower())
+            except KeyError:
+                # XXX: How to handle unknown distributions?
+                pass
+            else:
+                dist_id = (await conn.execute(
+                    sa.select(DistCpe.id)
+                    .where(DistCpe.cpe_vendor == dist.cpe_vendor)
+                    .where(DistCpe.cpe_product == dist.cpe_product)
+                    .where(DistCpe.cpe_version == dist.cpe_version)
+                )).one()[0]
 
-            for source, version in j:
-                stmts_source.append(
-                    sa.select(
-                        sa.literal(dist_id).label('dist_id'),
-                        sa.literal(source).label('deb_source'),
-                        sa.cast(sa.literal(version), DebVersion).label('deb_version'),
+                for source, version in j:
+                    stmts_source.append(
+                        sa.select(
+                            sa.literal(dist_id).label('dist_id'),
+                            sa.literal(source).label('deb_source'),
+                            sa.cast(sa.literal(version), DebVersion).label('deb_version'),
+                        )
                     )
-                )
 
         # If we found no source at all
         if not stmts_source:
