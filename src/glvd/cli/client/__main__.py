@@ -7,6 +7,7 @@ from . import cli
 # Import to register all the commands
 from . import (  # noqa: F401
     cve,
+    cve_apt,
 )
 
 
