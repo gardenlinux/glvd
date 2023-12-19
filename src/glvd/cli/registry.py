@@ -21,10 +21,10 @@ class CliRegistry:
 
     arguments: list[_ActionWrapper]
 
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
         self.parser = argparse.ArgumentParser(
             allow_abbrev=False,
-            prog='glvd',
+            prog=name,
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         self.subparsers = self.parser.add_subparsers(
