@@ -26,4 +26,12 @@ Other important files are:
 - [setup.cfg](./setup.cfg): Configuration file for defining the metadata of the Python project typically used by setuptools.
 
 ## Documentation
-The documenation of the Security Tracker itself, can be found in the [docs/](./docs/) directory.
+
+### Client
+
+The client documentation can be found here: [docs/01_client.md](./docs/01_client.md)
+
+### Server
+
+
+### Ingestion
