@@ -3,7 +3,7 @@
 This repository contains the Security Tracker of Garden Linux. The Security Tracker is called `glvd` and it is an application written in Python that is operated within a Debian testing container. By offering a container image, the Security Tracker can simply be operated on any machine via tools like `docker` or `podman` but it could also be used for container orchestration tools like Kubernetes in order to run it at scale.
 
 More information about the infrastructure on which `glvd` will be operated, can be found here:
-* https://github.com/gardenlinux/glvd-infrastructure
+* [gardenlinux/glvd-infrastructure](https://github.com/gardenlinux/glvd-infrastructure)
 
 This repository on the other hand contains the actual source code of the Security Tracker.
 
