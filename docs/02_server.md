@@ -1,6 +1,6 @@
 # Server
 
-The Garden Linux Security Tracker `glvd` uses [Quart](https://pgjones.gitlab.io/quart/) which is a Fast Python web microframework.
+The Garden Linux Security Tracker `glvd` uses [Quart](https://quart.palletsprojects.com/en/latest/) which is a Fast Python web microframework.
 
 ## Purposes
 
