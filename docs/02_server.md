@@ -16,6 +16,7 @@ The general API is described in the following specificiation:
 
 Thereby, it offers the following API endpoints:
 
+---
 ##### Endpoint: `v1/cves/findByCpe`:
 Finds CVE by CPE
 
@@ -28,6 +29,7 @@ Supported HTTP methods:
 | `cvssV3SeverityMin` | The min severity that a CVE must have. |
 | `debVersionEnd` | The maximum version | 
 
+---
 ##### Endpoint `v1/cves/findBySources`:
 Finds CVE by source packages
 
@@ -40,6 +42,7 @@ Supported HTTP methods:
 
 The POST body must contain a list of source packages for which one searches the corresponding CVEs. A list item could look like this: `debian_bookworm_glibc_2.36-9+deb12u3`
 
+---
 ##### Endpoint `v1/cves/findBySources`:
 Find CVE by ID
 

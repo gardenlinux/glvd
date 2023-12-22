@@ -19,7 +19,8 @@ In order to run a PostgreSQL container that fits the `glvd`'s needs, a dedicated
 
 Next to this, there are a handfull of tables that are consumed by `glvd`. The following section shows, what database tables exists, how they are defined and which purpose those have:
 
-#### Table: `nvd_cve`
+---
+##### Table: `nvd_cve`
 This table contains the CVEs from NVD so that `glvd` can immediately access all available CVEs without querying the NVD API endpoint.
 
 | Attribut | Description |
@@ -28,7 +29,8 @@ This table contains the CVEs from NVD so that `glvd` can immediately access all 
 |`last_mod`    | The last modification date of this data (e.g `2019-06-11 20:29:00.263+00`). |
 |`data`   | The actual CVE data from NVD. This is stored as a JSON.|
 
-#### Table: `all_cve`
+---
+##### Table: `all_cve`
 Compared to `nvd_cve`, this table contains all known CVEs of the `glvd`. This table is filled by the `combine-all` ingestion command which takes not only NVD CVEs but also CVEs that are only known by for example Debian. In other words, the `nvd_cve` is a subset of the `all_cve` table.
 
 | Attribut | Description |
@@ -37,7 +39,8 @@ Compared to `nvd_cve`, this table contains all known CVEs of the `glvd`. This ta
 |`last_mod`    | The last modification date of this data (e.g `2019-06-11 20:29:00.263+00`). |
 |`data`   | The actual CVE data from NVD. This is stored as a JSON.|
 
-#### Table: `dist_cpe`
+---
+##### Table: `dist_cpe`
 This table contains all available CPEs in `glvd` split between multiple products (e.g `debian_linux` or `gardenlinux`). Thereby, those CPEs represent each available distribution in `glvd`. Typically, these are all Debian distributions and all Garden Linux ones.
 
 | Attribut | Description |
@@ -48,7 +51,8 @@ This table contains all available CPEs in `glvd` split between multiple products
 |`cpe_version`    | The version of the CPE (e.g `11`) |
 |`deb_codename`    | The codename of an CPE product (e.g `bullseye`) |
 
-#### Table: `debsrc`
+---
+##### Table: `debsrc`
 Contains all source packages of each supported distribution of `glvd`. What distributions are supported is defined via the `dist_cpe` table. Each distribution is there represented by a CPE.
 | Attribut | Description |
 |----------|-------------|
@@ -57,7 +61,8 @@ Contains all source packages of each supported distribution of `glvd`. What dist
 |`deb_source`    | The name of the source package (e.g `0ad`) |
 |`deb_version`   | The version of the source package (e.g `0.0.23.1-2`) |
 
-#### Table: `debsec_cve`
+---
+##### Table: `debsec_cve`
 This table contains the entries of the CVE list (`debsec``) of each distribution defined in the `dist_cpe` table. Each CPE product provides its own CVE list which explains what CVE exists in context of the distribution and what the status of this corresponding CVE is. In some cases, CVE might be already fixed by the distribution. In such cases, the list would contain an entry explaining that the distribution is not affected by the corresponding CVE.
 
 For Debian for example, this table contains the CVE entries from this list here:
@@ -72,7 +77,8 @@ For Debian for example, this table contains the CVE entries from this list here:
 |`debsec_tag`    | A specific tag of the CVE list entry |
 |`debsec_note`    | A specific note for the CVE list entry |
 
-#### Table: `deb_cve`
+---
+##### Table: `deb_cve`
 Whereas the `devsec_cve` table is the plain representation of the given CVE list of a distribution, this `deb_cve` table basically contains the same information but is enriched by additional information that are put together, so that processing is easier for `glvd`.
 
 | Attribut | Description |
