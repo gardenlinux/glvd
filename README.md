@@ -28,12 +28,10 @@ Other important files are:
 ## Documentation
 
 ### Client
-
 The client documentation can be found here: [docs/01_client.md](./docs/01_client.md)
 
 ### Server
 The server documentation can be found here: [docs/02_server.md](./docs/02_server.md)
 
 ### Ingestion
-
 The ingestion documentation can be found here: [docs/03_ingestion.md](./docs/03_ingestion.md)
