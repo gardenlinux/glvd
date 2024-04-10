@@ -1,0 +1,60 @@
+## Local vs Production
+
+credativ created an glvd-infrastructure repo that contains opentofu code to provision the infrastructure for glvd in a cloud.
+This spawns a single VM, starting multiple container via systemd services.
+
+A local setup does not yet exist. A local setup should obviously run completely local. It should be a simple setup script that 
+spawns all containers and configures them accordingly, so the postgress and API server are running locally.
+
+* GLVD container on port 8000
+* postgres container on port 5432
+
+
+
+### local setup
+
+#### postgress
+
+
+Start the postgress container
+```
+./local/start-postgres.sh ghcr.io/gardenlinux/glvd-postgres:edge password
+```
+
+Check if it is running with:
+```
+psql -h localhost -p 5432 -U glvd -W
+SELECT version();
+```
+
+
+start the api server container
+
+```
+./local/start-api.sh ghcr.io/gardenlinux/glvd:edge password
+```
+
+
+start the ingestion container
+
+```
+./local/start-ingestion.sh ghcr.io/gardenlinux/glvd:edge password
+```
+
+
+check logs of container 
+```
+podman logs glvd_ingestion 
+```
+
+
+or login to container 
+``` 
+podman exec -it glvd_ingestion /bin/bash
+``` 
+
+
+run query against api server:
+```
+poetry run glvd cve --server localhost:8000  CVE-2024-3094
+```
