@@ -11,6 +11,7 @@ This repository on the other hand contains the actual source code of the Securit
 Thereby, this repostory contains the following directories:
 
 - `docs/`: This directory contains documentation regarding `glvd`.
+  - `adr/`: This directory contains ADRs (Architecture Decision Records), as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
 - `src/`: This directory contains the source files of `glvd`.
   - `glvd/`: The main directory of the Security Tracker.
     - `cli/`: Command Line Interface for running operational tasks on `glvd`.
