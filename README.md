@@ -8,7 +8,7 @@ More information about the infrastructure on which `glvd` will be operated, can 
 This repository on the other hand contains the actual source code of the Security Tracker.
 
 ## Repository Structure
-Thereby, this repostory contains the following directories:
+Thereby, this repository contains the following directories:
 
 - `docs/`: This directory contains documentation regarding `glvd`.
   - `adr/`: This directory contains ADRs (Architecture Decision Records), as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
