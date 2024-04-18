@@ -1,0 +1,14 @@
+{
+    "name": "dev",
+    "build": {
+        "dockerfile": "Containerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.vscode-pylance"
+            ]
+        }
+    },
+    "postStartCommand": "pip install --break-system-packages --no-deps --editable ."
+}
