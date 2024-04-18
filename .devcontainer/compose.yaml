@@ -1,0 +1,12 @@
+services:
+  glvd:
+    build:
+      dockerfile: Containerfile
+  glvd-postgres:
+    image: localhost/mypg:latest
+    environment:
+      POSTGRES_USER: glvd
+      POSTGRES_DB: glvd
+      POSTGRES_PASSWORD: glvd
+    expose:
+      - 5432

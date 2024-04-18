@@ -1,14 +1,16 @@
 {
-    "name": "dev",
-    "build": {
-        "dockerfile": "Containerfile"
-    },
+    "name": "glvd",
+    "dockerComposeFile": "compose.yaml",
+    "service": "glvd",
+    "workspaceFolder": "/workspaces/glvd",
+    "remoteUser": "dev",
+    "shutdownAction": "stopCompose",
+    "forwardPorts": [5432],
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.vscode-pylance"
             ]
         }
-    },
-    "postStartCommand": "pip install --break-system-packages --no-deps --editable ."
+    }
 }
