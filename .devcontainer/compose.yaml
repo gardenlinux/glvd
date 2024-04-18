@@ -3,7 +3,7 @@ services:
     build:
       dockerfile: Containerfile
   glvd-postgres:
-    image: localhost/mypg:latest
+    image: ghcr.io/gardenlinux/glvd-postgres:edge
     environment:
       POSTGRES_USER: glvd
       POSTGRES_DB: glvd
