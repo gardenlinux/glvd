@@ -79,7 +79,7 @@ For Debian for example, this table contains the CVE entries from this list here:
 
 ---
 ##### Table: `deb_cve`
-Whereas the `devsec_cve` table is the plain representation of the given CVE list of a distribution, this `deb_cve` table basically contains the same information but is enriched by additional information that are put together, so that processing is easier for `glvd`.
+Whereas the `debsec_cve` table is the plain representation of the given CVE list of a distribution, this `deb_cve` table basically contains the same information but is enriched by additional information that are put together, so that processing is easier for `glvd`.
 
 | Attribut | Description |
 |----------|-------------|
