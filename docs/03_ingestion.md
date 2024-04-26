@@ -63,7 +63,7 @@ Contains all source packages of each supported distribution of `glvd`. What dist
 
 ---
 ##### Table: `debsec_cve`
-This table contains the entries of the CVE list (`debsec``) of each distribution defined in the `dist_cpe` table. Each CPE product provides its own CVE list which explains what CVE exists in context of the distribution and what the status of this corresponding CVE is. In some cases, CVE might be already fixed by the distribution. In such cases, the list would contain an entry explaining that the distribution is not affected by the corresponding CVE.
+This table contains the entries of the CVE list (`debsec`) of each distribution defined in the `dist_cpe` table. Each CPE product provides its own CVE list which explains what CVE exists in context of the distribution and what the status of this corresponding CVE is. In some cases, CVE might be already fixed by the distribution. In such cases, the list would contain an entry explaining that the distribution is not affected by the corresponding CVE.
 
 For Debian for example, this table contains the CVE entries from this list here:
 * https://salsa.debian.org/security-tracker-team/security-tracker/-/blob/master/data/CVE/list
