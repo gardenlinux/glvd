@@ -17,7 +17,67 @@ The PostgreSQL database is operated as a container on an EC2 instance running on
 In order to run a PostgreSQL container that fits the `glvd`'s needs, a dedicated Git repository has been created which takes the generally available PostgreSQL container image and installs required extensions and configuration into the container needed by the Security Tracker. A corresponding Github Action builds the container and publishes it. You can find the repository and the corresponding container image here:
 * [gardenlinux/glvd-postgres](https://github.com/gardenlinux/glvd-postgres)
 
-Next to this, there are a handfull of tables that are consumed by `glvd`. The following section shows, what database tables exists, how they are defined and which purpose those have:
+Next to this, there are a handfull of tables that are consumed by `glvd`.
+
+Entity relationship diagram generated using [mermerd](https://github.com/KarnerTh/mermerd):
+
+```mermaid
+erDiagram
+    all_cve {
+        text cve_id PK
+        json data
+        timestamp_with_time_zone last_mod
+    }
+
+    deb_cve {
+        text cve_id PK
+        integer cvss_severity
+        json data_cpe_match
+        text deb_source PK
+        debversion deb_version
+        debversion deb_version_fixed
+        boolean debsec_vulnerable
+        integer dist_id PK,FK
+        timestamp_with_time_zone last_mod
+    }
+
+    debsec_cve {
+        text cve_id PK
+        text deb_source PK
+        debversion deb_version_fixed
+        text debsec_note
+        text debsec_tag
+        integer dist_id PK,FK
+        timestamp_with_time_zone last_mod
+    }
+
+    debsrc {
+        text deb_source PK
+        debversion deb_version
+        integer dist_id PK,FK
+        timestamp_with_time_zone last_mod
+    }
+
+    dist_cpe {
+        text cpe_product
+        text cpe_vendor
+        text cpe_version
+        text deb_codename
+        integer id PK
+    }
+
+    nvd_cve {
+        text cve_id PK
+        json data
+        timestamp_with_time_zone last_mod
+    }
+
+    deb_cve }o--|| dist_cpe : "dist_id"
+    debsec_cve }o--|| dist_cpe : "dist_id"
+    debsrc }o--|| dist_cpe : "dist_id"
+```
+
+The following section shows, what database tables exists, how they are defined and which purpose those have:
 
 ---
 ##### Table: `nvd_cve`
