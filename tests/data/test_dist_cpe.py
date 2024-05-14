@@ -48,11 +48,19 @@ class TestDistCpeMapperDebian:
 
 
 class TestDistCpeMapperGardenlinux:
-    def test_valid(self) -> None:
+    @pytest.mark.parametrize(
+        'codename,version',
+        [
+            ('1443', '1443.3'),
+            ('today', 'today'),
+            ('', ''),
+        ],
+    )
+    def test_valid(self, codename: str, version: str) -> None:
         m = DistCpeMapper.new('gardenlinux')
-        c = m('999.9')
+        c = m(codename)
 
         assert c.cpe_vendor == 'sap'
         assert c.cpe_product == 'gardenlinux'
-        assert c.cpe_version == '999.9'
-        assert c.deb_codename == '999.9'
+        assert c.cpe_version == version
+        assert c.deb_codename == codename
