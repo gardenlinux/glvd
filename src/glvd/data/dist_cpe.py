@@ -63,9 +63,14 @@ class DistCpeMapperGardenlinux(DistCpeMapper):
     cpe_product = 'gardenlinux'
 
     def __call__(self, codename: str) -> DistCpe:
+        version: str = {
+            '1443': '1443.3',
+            'today': 'today',
+            '': '',
+        }[codename]
         return DistCpe(
             cpe_vendor='sap',
             cpe_product='gardenlinux',
-            cpe_version=codename,
+            cpe_version=version,
             deb_codename=codename,
         )
