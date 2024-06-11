@@ -35,9 +35,17 @@ As a user of Garden Linux I want to track security issues in any given Garden Li
 ## Acceptance Criteria 
 
 - [ ] The user can query for Garden Linux images such as `gardenlinux-gcp-gardener-prod-amd64-1443-5-bfb687a7`
-- [ ] The user can provide additional packages from the Garden Linux APT repo (in the same release as the image)
+
 
 # USER-04
+
+As a user of Garden Linux I want to track security issues that additional packages bring into my image.
+
+## Acceptance Criteria 
+
+- [ ] The user can provide additional packages from the Garden Linux APT repo (in the same release as the image in use)
+
+# USER-05
 
 As a user of Garden Linux I want to be notified of new CVEs in the Garden Linux patch version I'm using.
 
@@ -47,11 +55,11 @@ As a user of Garden Linux I want to be notified of new CVEs in the Garden Linux 
 - [ ] I get a notification for new patch releases in that version (like 1443.6) so I can upgrade as soon as possible
 - [ ] I can select a Garden Linux major version (like 1443) to be notified on new and fixed CVEs in that version
 
-# USER-05
+# USER-06
 
 As a user of Garden Linux I want to be notified of new major versions of Garden Linux so I can plan to upgrade.
 
-# USER-06
+# USER-07
 
 As a user of GLVD I want a simple web interface to work with the service in a convenient way.
 
@@ -59,13 +67,21 @@ As a user of GLVD I want a simple web interface to work with the service in a co
 
 - [ ] Features described in the previous user stories can be accessed in a minimal web interface
 
-# USER-07
+# USER-08
 
 As a user of GLVD I want a CLI tool to interact with the service.
 
 ## Acceptance Criteria 
 
 - [ ] Features described in the previous user stories can be accessed using a command line tool
+
+# USER-09
+
+As a user of Garden Linux (container images) I want to be informed about additional issues installed packages bring.
+
+## Acceptance Criteria 
+
+- [ ] A 'apt install' cli wrapper prints information on additional CVEs introduced by that package
 
 # GLDEV-01
 
