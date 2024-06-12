@@ -64,7 +64,12 @@ class DistCpeMapperGardenlinux(DistCpeMapper):
 
     def __call__(self, codename: str) -> DistCpe:
         version: str = {
-            '1443': '1443.3',
+            '1443.0': '1443.0',
+            '1443.1': '1443.1',
+            '1443.2': '1443.2',
+            '1443.3': '1443.3',
+            # latest patch release gets codename without the dot -> for cases where you want to follow the latest
+            '1443': '1443.5',
             'today': 'today',
             '': '',
         }[codename]

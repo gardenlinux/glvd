@@ -51,7 +51,11 @@ class TestDistCpeMapperGardenlinux:
     @pytest.mark.parametrize(
         'codename,version',
         [
-            ('1443', '1443.3'),
+            ('1443.0', '1443.0'),
+            ('1443.1', '1443.1'),
+            ('1443.2', '1443.2'),
+            ('1443.3', '1443.3'),
+            ('1443', '1443.5'),
             ('today', 'today'),
             ('', ''),
         ],
