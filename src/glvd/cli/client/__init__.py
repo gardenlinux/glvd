@@ -9,7 +9,7 @@ cli = CliRegistry('glvd')
 
 cli.add_argument(
     '--server',
-    default='http://localhost:5000',
+    default='http://glvd.gardenlinux.io',
     help='the server to use',
 )
 cli.add_argument(
