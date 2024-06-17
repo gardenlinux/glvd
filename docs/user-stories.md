@@ -28,23 +28,6 @@ As a user of Garden Linux I want to subscribe to updates on new security issues 
 - The backend/db needs to keep track of tracking urls
 - Users might want to subscribe with their email address; this introduces a new class of issues legally (data protection)
 
-# USER-03
-
-As a user of Garden Linux I want to track security issues in any given Garden Linux *image* so I can make an informed decision about needed actions in my system.
-
-## Acceptance Criteria 
-
-- [ ] The user can query for Garden Linux images such as `gardenlinux-gcp-gardener-prod-amd64-1443-5-bfb687a7`
-
-
-# USER-04
-
-As a user of Garden Linux I want to track security issues that additional packages bring into my image.
-
-## Acceptance Criteria 
-
-- [ ] The user can provide additional packages from the Garden Linux APT repo (in the same release as the image in use)
-
 # USER-05
 
 As a user of Garden Linux I want to be notified of new CVEs in the Garden Linux patch version I'm using.
@@ -82,6 +65,24 @@ As a user of Garden Linux (container images) I want to be informed about additio
 ## Acceptance Criteria 
 
 - [ ] A 'apt install' cli wrapper prints information on additional CVEs introduced by that package
+
+# De-prioritized user stories
+
+# USER-03
+
+As a user of Garden Linux I want to track security issues in any given Garden Linux *image* so I can make an informed decision about needed actions in my system.
+
+## Acceptance Criteria 
+
+- [ ] The user can query for Garden Linux images such as `gardenlinux-gcp-gardener-prod-amd64-1443-5-bfb687a7`
+
+# USER-04
+
+As a user of Garden Linux I want to track security issues that additional packages bring into my image.
+
+## Acceptance Criteria 
+
+- [ ] The user can provide additional packages from the Garden Linux APT repo (in the same release as the image in use)
 
 # GLDEV-01
 
