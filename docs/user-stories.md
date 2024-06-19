@@ -13,7 +13,7 @@ As a user of Garden Linux I want to know about security issues in Garden Linux s
 - This does not yet require a nice user interface, an HTTP API is sufficient
 - This does not yet include knowledge about which packages are included in any given Garden Linux image, the user provides a list of package names and versions
 
-# USER-02
+# USER-02 (lower prio)
 
 As a user of Garden Linux I want to subscribe to updates on new security issues in the packages I care about.
 
@@ -42,13 +42,13 @@ As a user of Garden Linux I want to be notified of new CVEs in the Garden Linux 
 
 As a user of Garden Linux I want to be notified of new major versions of Garden Linux so I can plan to upgrade.
 
-# USER-07
+# USER-07 (higher prio)
 
 As a user of GLVD I want a simple web interface to work with the service in a convenient way.
 
 ## Acceptance Criteria 
 
-- [ ] Features described in the previous user stories can be accessed in a minimal web interface
+- [ ] Features described in the previous user stories can be accessed in a minimal web interface, similar to debian security tracker UI
 
 # USER-08
 
