@@ -50,8 +50,9 @@ echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.3)"
 glvd-data ingest-debsrc gardenlinux 1443.3 ./gardenlinux-packages/1443.3
 echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.5)"
 glvd-data ingest-debsrc gardenlinux 1443 ./gardenlinux-packages/1443.5
-
-# todo: enable later, for now let's focus on getting any ingestion working, ingest-nvd takes too long for that purpose
-# glvd-data ingest-nvd
-# glvd-data combine-deb
-# glvd-data combine-all
+echo "Run data ingestion (nvd)"
+glvd-data ingest-nvd
+echo "Run data combination (combine-deb)"
+glvd-data combine-deb
+echo "Run data combination (combine-all)"
+glvd-data combine-all
