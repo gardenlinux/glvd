@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-apt-get -q update
-apt-get -yqq install git curl debian-archive-keyring postgresql-client
 mkdir -p data/ingest-debsec/{debian,gardenlinux}/CVE
 mkdir -p data/ingest-debsec/debian/CVE
 mkdir -p data/ingest-debsrc/debian
