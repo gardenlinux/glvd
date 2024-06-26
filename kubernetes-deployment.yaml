@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: glvd-postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: 'default'
+
+---
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -15,6 +29,10 @@ spec:
       labels:
         app: glvd
     spec:
+      volumes:
+      - name: glvd-postgres-storage
+        persistentVolumeClaim:
+          claimName: glvd-postgres-pvc
       containers:
         - image: ghcr.io/gardenlinux/glvd-api:edge_bare
           name: glvd-api
@@ -70,6 +88,11 @@ spec:
               value: glvd-postgres
             - name: POSTGRES_PORT
               value: "5432"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+          - mountPath: "/var/lib/postgresql/data"
+            name: glvd-postgres-storage
         # TODO: data-ingestion should be running as a cron job
         - name: data-ingestion
           image: ghcr.io/gardenlinux/glvd:edge
