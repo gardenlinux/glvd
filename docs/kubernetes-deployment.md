@@ -9,9 +9,15 @@ Assuming you have a Kubernetes cluster with enough resources (8 cpu, 16 GiB memo
 # create a random password for the database
 kubectl create secret generic postgres-password --type=string --from-literal=password=$(pwgen 42 1)
 
+# create persistent volume claim for postgres storage
+kubectl apply -f 00-glvd-pvc.yaml
+
 # create deployment (needs the password secret)
 # this will be starting the data ingestion process which takes a while for the first time
-kubectl apply -f kubernetes-deployment.yaml
+kubectl apply -f 01-glvd-deployment.yaml
+
+# create service to expose the api http interface
+kubectl apply -f 02-glvd-service.yaml
 
 # check the progress, the last line should say 'done'
 kubectl logs -c data-ingestion glvd-SOME-ID
