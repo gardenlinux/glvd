@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-settings
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: glvd
+    helm.sh/chart: glvd
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    gardenlinux.io/glvd-component: database
+data:
+  postgres_database: {{ .Values.database.settings.databaseName }}
+  postgres_host: {{ .Values.database.settings.databaseHost }}

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glvd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: glvd
+    helm.sh/chart: glvd
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    gardenlinux.io/glvd-component: tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: glvd
+      helm.sh/chart: glvd
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      gardenlinux.io/glvd-component: tracker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: glvd
+        helm.sh/chart: glvd
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        gardenlinux.io/glvd-component: tracker
+    spec:
+      containers:
+      - image: {{ .Values.image.repository }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: glvd-api
+        ports:
+          - containerPort: 8080
+            name: glvd-api
+            protocol: TCP
+        resources:
+{{- toYaml .Values.resources | nindent 10 }}
+        env:
+        # cf https://github.com/spring-projects/spring-lifecycle-smoke-tests/tree/main/data/data-jpa#prevent-early-database-interaction
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://glvd-database-0.glvd-database:5432/glvd" # FIXME: build this with a helper
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: glvd-creds
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: glvd-creds
+              key: password
+        - name: SPRING_JPA_DATABASEPLATFORM
+          value: "org.hibernate.dialect.PostgreSQLDialect"
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_BOOT_ALLOW_JDBC_METADATA_ACCESS
+          value: "false"
+        - name: SPRING_JPA_HIBERNATE_DDLAUTO
+          value: "none"
+        - name: SPRING_SQL_INIT_MODE
+          value: "never"
+        livenessProbe:
+          httpGet:
+            path: "/actuator/health/liveness"
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: "/actuator/health/readiness"
+            port: 8080

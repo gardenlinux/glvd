@@ -1,0 +1,31 @@
+image: 
+  repository: ghcr.io/gardenlinux/glvd-api:edge_bare
+  pullPolicy: IfNotPresent
+resources:
+  requests:
+    cpu: "1"
+    memory: "2Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
+loadbalancerPort: 8080
+
+database:
+  image: 
+    repository: ghcr.io/gardenlinux/glvd-postgres:edgenotls
+    pullPolicy: IfNotPresent
+  port: 5432
+  resources:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+  volumeSize: 5Gi
+  settings:
+    databaseHost: glvd-postgres
+    databaseName: glvd
+  credentials:
+    username: glvd
+    password: glvd
