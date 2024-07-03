@@ -49,7 +49,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 120
       containers:
-      - image: {{ .Values.database.image }}
+      - image: {{ .Values.database.image.repository }}
         name: postgres-db
         resources:
 {{- toYaml .Values.database.resources | nindent 10 }}
