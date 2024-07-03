@@ -55,14 +55,6 @@ spec:
 {{- toYaml .Values.database.resources | nindent 10 }}
         ports:
         - containerPort: {{ .Values.database.port }}
-        livenessProbe:
-          httpGet:
-            path: "/actuator/health/liveness"
-            port: 8080
-        readinessProbe:
-          httpGet:
-            path: "/actuator/health/readiness"
-            port: 8080
         env:
         - name: POSTGRES_USER
           valueFrom:
