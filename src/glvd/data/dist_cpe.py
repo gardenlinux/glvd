@@ -68,8 +68,11 @@ class DistCpeMapperGardenlinux(DistCpeMapper):
             '1443.1': '1443.1',
             '1443.2': '1443.2',
             '1443.3': '1443.3',
+            '1443.5': '1443.5',
+            '1443.7': '1443.6',
+            '1443.8': '1443.7',
             # latest patch release gets codename without the dot -> for cases where you want to follow the latest
-            '1443': '1443.5',
+            '1443': '1443.9',
             'today': 'today',
             '': '',
         }[codename]
