@@ -26,6 +26,9 @@ curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.1/main/binary-amd
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.2/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.2.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.3/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.3.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.5/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.5.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.7/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.7.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.8/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.8.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.9/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.9.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/today/main/binary-amd64/Packages.gz > gardenlinux-packages/today.gz
 gunzip gardenlinux-packages/1443*.gz
 gunzip gardenlinux-packages/today.gz
@@ -47,7 +50,13 @@ glvd-data ingest-debsrc gardenlinux 1443.2 ./gardenlinux-packages/1443.2
 echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.3)"
 glvd-data ingest-debsrc gardenlinux 1443.3 ./gardenlinux-packages/1443.3
 echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.5)"
-glvd-data ingest-debsrc gardenlinux 1443 ./gardenlinux-packages/1443.5
+glvd-data ingest-debsrc gardenlinux 1443.5 ./gardenlinux-packages/1443.5
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.7)"
+glvd-data ingest-debsrc gardenlinux 1443.7 ./gardenlinux-packages/1443.7
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.8)"
+glvd-data ingest-debsrc gardenlinux 1443.8 ./gardenlinux-packages/1443.8
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.9)"
+glvd-data ingest-debsrc gardenlinux 1443 ./gardenlinux-packages/1443.9
 echo "Run data ingestion (nvd)"
 glvd-data ingest-nvd
 echo "Run data combination (combine-deb)"
