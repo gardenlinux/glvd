@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: glvd-data-ingestion
+spec:
+  jobTemplate:
+    metadata:
+      name: glvd-data-ingestion
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - /usr/local/src/ingest-postgres.sh
+            image: ghcr.io/gardenlinux/glvd:edge
+            name: glvd-data-ingestion
+            resources: {}
+            env:
+              - name: PGUSER
+                value: glvd
+              - name: PGDATABASE
+                value: glvd
+              - name: PGPASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: glvd-creds
+                    key: password
+              - name: PGHOST
+                value: glvd-database-0.glvd-database
+              - name: PGPORT
+                value: "5432"
+          restartPolicy: OnFailure
+  schedule: 0/15 * * * ?
