@@ -29,3 +29,11 @@ database:
   credentials:
     username: glvd
     password: glvd
+
+ingestion:
+  image:
+    repository: ghcr.io/gardenlinux/glvd:edge
+    pullPolicy: IfNotPresent
+  database:
+    username: glvd
+    databaseName: glvd
