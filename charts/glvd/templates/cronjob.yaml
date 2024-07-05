@@ -31,5 +31,5 @@ spec:
               - name: PGPORT
                 value: "5432"
           restartPolicy: OnFailure
-  schedule: '0 11 * * *'
+  schedule: '0 9 * * *'
   timeZone: 'Europe/Berlin'
