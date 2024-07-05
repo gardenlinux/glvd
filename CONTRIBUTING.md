@@ -33,9 +33,3 @@ PYTHONPATH=src pytest
 flake8
 mypy .
 ```
-
-## Run web interface
-
-```
-PYTHONPATH=src quart --app glvd.web run
-```
