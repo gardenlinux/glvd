@@ -32,7 +32,7 @@ database:
 
 ingestion:
   image:
-    repository: ghcr.io/gardenlinux/glvd:edge
+    repository: ghcr.io/gardenlinux/glvd-data-ingestion:edge
     pullPolicy: IfNotPresent
   database:
     username: glvd
