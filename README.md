@@ -17,7 +17,6 @@ Thereby, this repostory contains the following directories:
     - `cli/`: Command Line Interface for running operational tasks on `glvd`.
     - `data/`: The backend implementation for dealing with the Security Tracker data like CPEs, CVEs and Debian Sources.
     - `database/`: Contains the sqlalchemy classes for representing each table used by `glvd`.
-    - `web/`: The actual web application and its endpoint that can be called to receive vulnerabilities from the Security Tracker. This code represents the API.
 - `tests/`: This directory contains all tests (e.g. unit tests) used by pytest regarding `glvd`.
 
 Other important files are:
