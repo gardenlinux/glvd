@@ -110,3 +110,14 @@ As a developer of Garden Linux I want to generate parts of release notes for new
 
 - [ ] GLVD can create markdown output that is suitable for adding it to Github releases page
 
+
+
+
+
+# Notes from discussion
+
+- Get List of vuln by package name and version
+- Get List of vuln packages by distro
+- Get List of vuln packages by image
+  - needs manifest files from images (package list with version)
+- Get List of vuln packages by CVE id
