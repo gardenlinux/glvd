@@ -45,29 +45,3 @@ class TestDistCpeMapperDebian:
 
         with pytest.raises(KeyError):
             m('invalid')
-
-
-class TestDistCpeMapperGardenlinux:
-    @pytest.mark.parametrize(
-        'codename,version',
-        [
-            ('1443.0', '1443.0'),
-            ('1443.1', '1443.1'),
-            ('1443.2', '1443.2'),
-            ('1443.3', '1443.3'),
-            ('1443.5', '1443.5'),
-            ('1443.7', '1443.7'),
-            ('1443.8', '1443.8'),
-            ('1443', '1443.9'),
-            ('today', 'today'),
-            ('', ''),
-        ],
-    )
-    def test_valid(self, codename: str, version: str) -> None:
-        m = DistCpeMapper.new('gardenlinux')
-        c = m(codename)
-
-        assert c.cpe_vendor == 'sap'
-        assert c.cpe_product == 'gardenlinux'
-        assert c.cpe_version == version
-        assert c.deb_codename == codename

@@ -29,8 +29,12 @@ curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.5/main/binary-amd
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.7/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.7.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.8/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.8.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.9/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.9.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1443.10/main/binary-amd64/Packages.gz > gardenlinux-packages/1443.10.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1592.0/main/binary-amd64/Packages.gz > gardenlinux-packages/1592.0.gz
+curl -s https://packages.gardenlinux.io/gardenlinux/dists/1592.1/main/binary-amd64/Packages.gz > gardenlinux-packages/1592.1.gz
 curl -s https://packages.gardenlinux.io/gardenlinux/dists/today/main/binary-amd64/Packages.gz > gardenlinux-packages/today.gz
 gunzip gardenlinux-packages/1443*.gz
+gunzip gardenlinux-packages/1592*.gz
 gunzip gardenlinux-packages/today.gz
 
 echo "Run data ingestion (ingest-debsrc - debian trixie)"
@@ -56,7 +60,13 @@ glvd-data ingest-debsrc gardenlinux 1443.7 ./gardenlinux-packages/1443.7
 echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.8)"
 glvd-data ingest-debsrc gardenlinux 1443.8 ./gardenlinux-packages/1443.8
 echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.9)"
-glvd-data ingest-debsrc gardenlinux 1443 ./gardenlinux-packages/1443.9
+glvd-data ingest-debsrc gardenlinux 1443.9 ./gardenlinux-packages/1443.9
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1443.10)"
+glvd-data ingest-debsrc gardenlinux 1443 ./gardenlinux-packages/1443.10
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1592.0)"
+glvd-data ingest-debsrc gardenlinux 1592.0 ./gardenlinux-packages/1592.0
+echo "Run data ingestion (ingest-debsrc - gardenlinux 1592.1)"
+glvd-data ingest-debsrc gardenlinux 1592 ./gardenlinux-packages/1592.1
 echo "Run data ingestion (nvd)"
 glvd-data ingest-nvd
 echo "Run data combination (combine-deb)"
