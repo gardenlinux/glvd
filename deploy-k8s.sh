@@ -13,3 +13,4 @@ kubectl run init-pg --image=ghcr.io/gardenlinux/glvd-postgres-init:latest --rest
 sleep 60
 
 kubectl apply -f 01_glvd-deployment.yaml
+kubectl apply -f 02_ingestion-job.yaml
