@@ -46,7 +46,7 @@ spec:
         gardenlinux.io/glvd-component: glvd-tracker
     spec:
       containers:
-      - image: ghcr.io/gardenlinux/glvd-api:edge
+      - image: ghcr.io/gardenlinux/glvd-api:latest
         name: glvd-api
         # resources:
         #   requests:

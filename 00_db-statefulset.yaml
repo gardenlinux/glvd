@@ -17,16 +17,16 @@ spec:
   type: ClusterIP
   clusterIP: None
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-credentials
-  labels:
-    app.kubernetes.io/name: glvd
-    gardenlinux.io/glvd-component: database
-stringData:
-  username: glvd
-  password: change-me-i-am-not-secure123
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: postgres-credentials
+#   labels:
+#     app.kubernetes.io/name: glvd
+#     gardenlinux.io/glvd-component: database
+# stringData:
+#   username: glvd
+#   password: change-me-i-am-not-secure123
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -49,15 +49,8 @@ spec:
         gardenlinux.io/glvd-component: database
     spec:
       containers:
-      - image: ghcr.io/gardenlinux/glvd-postgres:edgefulldata
+      - image: ghcr.io/gardenlinux/glvd-postgres:latest
         name: glvd-postgres
-        resources:
-          requests:
-            cpu: "1"
-            memory: "2Gi"
-          limits:
-            cpu: "2"
-            memory: "4Gi"
         ports:
           - containerPort: 5432
             protocol: TCP
