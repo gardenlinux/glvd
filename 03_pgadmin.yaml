@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: glvd@gardenlinux.io
+        - name: PGADMIN_DEFAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgadmin-credentials
+              key: password
+        - name: PGADMIN_PORT
+          value: "80"
+        image: dpage/pgadmin4:8.12.0
+        imagePullPolicy: IfNotPresent
+        name: pgadmin
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: 4096Mi
