@@ -1,38 +1,30 @@
 # Garden Linux Vulnerability Database
 
-This repository contains the Security Tracker of Garden Linux. The Security Tracker is called `glvd` and it is an application written in Python that is operated within a Debian testing container. By offering a container image, the Security Tracker can simply be operated on any machine via tools like `docker` or `podman` but it could also be used for container orchestration tools like Kubernetes in order to run it at scale.
+This repository contains the central entrypoint to the Garden Linux Vulnerability Database (glvd) project.
+It implements an application to track security vulnerabilities in Garden Linux.
 
-More information about the infrastructure on which `glvd` will be operated, can be found here:
-* [gardenlinux/glvd-infrastructure](https://github.com/gardenlinux/glvd-infrastructure)
+> [!NOTE]  
+> GLVD is work in progress and does not provide a stable api yet.
 
-This repository on the other hand contains the actual source code of the Security Tracker.
+The code of glvd is located in multiple repositories inside the `gardenlinux` org on GitHub.
 
-## Repository Structure
-Thereby, this repostory contains the following directories:
+glvd is implemented in various components.
 
-- `docs/`: This directory contains documentation regarding `glvd`.
-  - `adr/`: This directory contains ADRs (Architecture Decision Records), as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
-- `src/`: This directory contains the source files of `glvd`.
-  - `glvd/`: The main directory of the Security Tracker.
-    - `cli/`: Command Line Interface for running operational tasks on `glvd`.
-    - `data/`: The backend implementation for dealing with the Security Tracker data like CPEs, CVEs and Debian Sources.
-    - `database/`: Contains the sqlalchemy classes for representing each table used by `glvd`.
-    - `web/`: The actual web application and its endpoint that can be called to receive vulnerabilities from the Security Tracker. This code represents the API.
-- `tests/`: This directory contains all tests (e.g. unit tests) used by pytest regarding `glvd`.
+## [Postgres container image](https://github.com/gardenlinux/glvd-postgres)
 
-Other important files are:
-- [Containerfile](./Containerfile): This file specifies the corresponding container of `glvd`.
-- [openapi-v1.yaml](./openapi-v1.yaml): This configuration defines the API endpoints of `glvd`.
-- [pyproject.toml](./pyproject.toml): The configuration file for defining the Python project / application.
-- [setup.cfg](./setup.cfg): Configuration file for defining the metadata of the Python project typically used by setuptools.
+A postgres database is the central component of glvd.
+This repository contains a Containerfile to run this database.
 
-## Documentation
+## [Data Ingestion](https://github.com/gardenlinux/glvd-data-ingestion)
 
-### Client
-The client documentation can be found here: [docs/01_client.md](./docs/01_client.md)
+Data ingestion creates the required database schema and imports data from external sources such as NVD and the debian security tracker.
 
-### Server
-The server documentation can be found here: [docs/02_server.md](./docs/02_server.md)
+## [Backend API](https://github.com/gardenlinux/glvd-api)
 
-### Ingestion
-The ingestion documentation can be found here: [docs/03_ingestion.md](./docs/03_ingestion.md)
+The backend api exposed an HTTP API to get data out of the database.
+
+It also contains a simple web interface.
+
+## [Client cli tool](https://github.com/gardenlinux/package-glvd)
+
+The client is available in the Garden Linux APT repo.
