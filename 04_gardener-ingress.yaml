@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: glvd-api-ingress
+  annotations:
+    cert.gardener.cloud/purpose: managed
+spec:
+  rules:
+  - host: glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: glvd
+            port: 
+              number: 8080
+  tls:
+  - hosts:
+    - glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com
+    secretName: glvd-ingress-tls

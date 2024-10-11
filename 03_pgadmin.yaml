@@ -32,3 +32,17 @@ spec:
         resources:
           limits:
             memory: 4096Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: pgadmin
+  type: LoadBalancer
