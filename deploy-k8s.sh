@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if ! [ -x "$(command -v pwgen)" ]; then
+  echo 'Error: pwgen is not installed.' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v kubectl)" ]; then
+  echo 'Error: kubectl is not installed.' >&2
+  exit 1
+fi
+
 if kubectl get secret | grep -q postgres-credentials ; then
     DB_PASSWORD=$(kubectl get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)
     echo 'found existing db credentials, re-using'
@@ -18,7 +28,7 @@ else
     echo 'did not find existing pgadmin credentials, creating new'
 fi
 
-kubectl apply -f 00_db-statefulset.yaml
+kubectl apply -f deployment/k8s/00_db-statefulset.yaml
 
 echo 'give db some time to pull image and start'
 sleep 30
@@ -31,5 +41,5 @@ else
     sleep 60
 fi
 
-kubectl apply -f 01_glvd-deployment.yaml
-kubectl apply -f 02_ingestion-job.yaml
+kubectl apply -f deployment/k8s/01_glvd-deployment.yaml
+kubectl apply -f deployment/k8s/02_ingestion-job.yaml
