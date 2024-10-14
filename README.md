@@ -39,3 +39,13 @@ Manifest files for a kubernetes deployment are located in [deployment/k8s](deplo
 Those deployments are used to create setup of glvd on a [Gardener](https://gardener.cloud) cluster.
 
 See the `deploy-k8s.sh` script for details.
+
+### [Compose Spec](https://compose-spec.io)
+
+A setup for [Compose](https://podman-desktop.io/docs/compose/running-compose) can be found in `deployment/compose/compose.yaml`.
+
+Example command to start locally:
+
+```bash
+podman compose --file deployment/compose/compose.yaml up
+```
