@@ -49,3 +49,13 @@ Example command to start locally:
 ```bash
 podman compose --file deployment/compose/compose.yaml up
 ```
+
+This will give you a running instance of the database and the backend, but the database has no schema and no data.
+
+To init the db, you may run something like:
+
+```bash
+podman run -it --rm --network=compose_glvd --env PGHOST=glvd-postgres ghcr.io/gardenlinux/glvd-init:latest
+```
+
+Note that this will wipe the existing database, so in case you want to keep data be sure to back it up.

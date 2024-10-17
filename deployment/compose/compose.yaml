@@ -2,6 +2,10 @@ services:
   glvd-postgres:
     image: ghcr.io/gardenlinux/glvd-postgres:latest
     hostname: glvd-postgres
+    networks:
+      - glvd
+    volumes:
+      - glvd_db_volume:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: glvd
       POSTGRES_DB: glvd
@@ -14,22 +18,15 @@ services:
       retries: 10
       start_period: 30s
       timeout: 10s
-  glvd-postgres-init:
-    image: ghcr.io/gardenlinux/glvd-init:latest
-    environment:
-      PGHOST: glvd-postgres
-      PGPASSWORD: glvd
+  glvd:
+    image: ghcr.io/gardenlinux/glvd-api:latest
+    hostname: glvd
+    networks:
+      - glvd
     depends_on:
       glvd-postgres:
         condition: service_healthy
         restart: false
-  glvd:
-    image: ghcr.io/gardenlinux/glvd-api:latest
-    hostname: glvd
-    depends_on:
-      glvd-postgres-init:
-        condition: service_completed_successfully
-        restart: true
     environment:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://glvd-postgres:5432/glvd"
       SPRING_DATASOURCE_USERNAME: "glvd"
@@ -40,3 +37,9 @@ services:
       SPRING_SQL_INIT_MODE: "never"
     ports:
       - "8080:8080"
+
+networks:
+  glvd: {}
+
+volumes:
+  glvd_db_volume:
