@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-policy
+spec:
+  podSelector:
+    matchLabels:
+      gardenlinux.io/glvd-component: database
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          gardenlinux.io/glvd-component: glvd-tracker
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          gardenlinux.io/glvd-component: glvd-tracker
+    ports:
+    - protocol: TCP
+      port: 5432
