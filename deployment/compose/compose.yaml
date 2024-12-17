@@ -18,6 +18,19 @@ services:
       retries: 10
       start_period: 30s
       timeout: 10s
+
+  glvd-init:
+    image: ghcr.io/gardenlinux/glvd-init:latest
+    networks:
+      - glvd
+    depends_on:
+      glvd-postgres:
+        condition: service_healthy
+        restart: false
+    environment:
+      PGHOST: glvd-postgres
+
+
   glvd:
     image: ghcr.io/gardenlinux/glvd-api:latest
     hostname: glvd
@@ -26,6 +39,9 @@ services:
     depends_on:
       glvd-postgres:
         condition: service_healthy
+        restart: false
+      glvd-init:
+        condition: service_completed_successfully
         restart: false
     environment:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://glvd-postgres:5432/glvd"
