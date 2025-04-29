@@ -63,6 +63,16 @@ spec:
             value: "5432"
           - name: PGDATA
             value: /var/lib/postgresql/data/pgdata
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - "$(POSTGRES_USER)"
+              - -d
+              - "$(POSTGRES_DATABASE)"
+          initialDelaySeconds: 10
+          periodSeconds: 5
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: postgres-storage

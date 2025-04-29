@@ -30,8 +30,8 @@ fi
 
 kubectl apply -f deployment/k8s/00_db-statefulset.yaml
 
-echo 'give db some time to pull image and start'
-sleep 30
+echo 'waiting for db pod to become ready'
+kubectl wait --for=condition=ready pod -l app=statefulset.kubernetes.io/pod-name=glvd-database-0 --timeout=120s
 
 if kubectl get po | grep -q init-pg ; then
     echo 'init-pg container exists, skipping init for now'
