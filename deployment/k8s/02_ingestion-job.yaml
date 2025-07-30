@@ -43,6 +43,9 @@ spec:
               - /bin/bash
               - -c
               - sleep 5 && echo start && /usr/local/src/ingest-postgres.sh
+            volumeMounts:
+              - name: changelogs-storage
+                mountPath: /changelogs
             env:
               - name: PGDATABASE
                 valueFrom:
@@ -69,3 +72,7 @@ spec:
                   configMapKeyRef:
                     name: glvd-ingestion
                     key: databasePort
+          volumes:
+            - name: changelogs-storage
+              persistentVolumeClaim:
+                claimName: changelogs-pv-claim

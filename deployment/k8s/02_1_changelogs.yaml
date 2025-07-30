@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: changelogs-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: changelogs-pod
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: changelogs-storage
+      persistentVolumeClaim:
+        claimName: changelogs-pv-claim
+  containers:
+    - name: changelogs-container
+      image: ghcr.io/gardenlinux/glvd-changelogs-downloader
+      volumeMounts:
+        - mountPath: "/usr/src/app/changelogs"
+          name: changelogs-storage
+
+
+
