@@ -38,7 +38,7 @@ spec:
         gardenlinux.io/glvd-component: database
     spec:
       containers:
-      - image: ghcr.io/gardenlinux/glvd-postgres:latest
+      - image: ghcr.io/gardenlinux/glvd-postgres:18
         name: glvd-postgres
         ports:
           - containerPort: 5432
@@ -62,15 +62,15 @@ spec:
           - name: POSTGRES_PORT
             value: "5432"
           - name: PGDATA
-            value: /var/lib/postgresql/data/pgdata
+            value: /var/lib/postgresql/18/docker
         volumeMounts:
-        - mountPath: "/var/lib/postgresql/data"
-          name: postgres-storage
+        - mountPath: "/var/lib/postgresql"
+          name: postgres18-storage
         - mountPath: "/backup"
           name: postgres-backup
   volumeClaimTemplates:
   - metadata:
-      name: postgres-storage
+      name: postgres18-storage
     spec:
       accessModes:
       - ReadWriteOnce
