@@ -5,7 +5,7 @@ services:
     networks:
       - glvd
     volumes:
-      - glvd_db_volume:/var/lib/postgresql/data
+      - glvd_db_volume:/var/lib/postgresql
     environment:
       POSTGRES_USER: glvd
       POSTGRES_DB: glvd
