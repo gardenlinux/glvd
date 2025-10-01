@@ -66,8 +66,6 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql"
           name: postgres18-storage
-        - mountPath: "/backup"
-          name: postgres-backup
   volumeClaimTemplates:
   - metadata:
       name: postgres18-storage
