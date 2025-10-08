@@ -88,6 +88,7 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql"
           name: postgres18-storage
+        # Mount /var/run/postgresql (needed by Postgres) and /tmp (useful for storing db dumps temporarily) as emptyDir so we can have readOnlyRootFilesystem as true
         - mountPath: /var/run/postgresql
           name: var-run-volume
         - mountPath: /tmp
