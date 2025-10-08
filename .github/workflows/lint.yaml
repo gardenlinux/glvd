@@ -1,0 +1,22 @@
+name: Lint K8s Manifests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/k8s-lint@v3
+        with:
+           manifests: |
+              deployment/k8s
+           kubeconformOpts: -summary
