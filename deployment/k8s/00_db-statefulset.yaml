@@ -62,6 +62,13 @@ spec:
           capabilities:
             drop:
               - '*'
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
         ports:
           - containerPort: 5432
             protocol: TCP
