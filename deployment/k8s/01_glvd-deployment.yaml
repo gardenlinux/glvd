@@ -26,6 +26,12 @@ spec:
     gardenlinux.io/glvd-component: glvd-tracker
   type: ClusterIP
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: glvd-api-sa
+automountServiceAccountToken: false
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,16 +51,32 @@ spec:
         app.kubernetes.io/name: glvd
         gardenlinux.io/glvd-component: glvd-tracker
     spec:
+      serviceAccountName: glvd-api-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - image: ghcr.io/gardenlinux/glvd-api:latest
+        imagePullPolicy: Always
         name: glvd-api
-        # resources:
-        #   requests:
-        #     cpu: "1"
-        #     memory: "2Gi"
-        #   limits:
-        #     cpu: "2"
-        #     memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - '*'
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -92,4 +114,11 @@ spec:
           httpGet:
             path: "/actuator/health/readiness"
             port: 8080
-
+        # Mount tmp as emptyDir so we can have readOnlyRootFilesystem as true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - name: tmp-volume
+        emptyDir:
+          sizeLimit: 500Mi

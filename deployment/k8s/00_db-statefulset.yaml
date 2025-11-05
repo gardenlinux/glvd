@@ -17,6 +17,12 @@ spec:
   type: ClusterIP
   clusterIP: None
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: glvd-database-sa
+automountServiceAccountToken: false
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -37,9 +43,32 @@ spec:
         app.kubernetes.io/name: glvd
         gardenlinux.io/glvd-component: database
     spec:
+      serviceAccountName: glvd-database-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - image: ghcr.io/gardenlinux/glvd-postgres:latest
+        imagePullPolicy: Always
         name: glvd-postgres
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - '*'
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
         ports:
           - containerPort: 5432
             protocol: TCP
@@ -66,6 +95,18 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql"
           name: postgres18-storage
+        # Mount /var/run/postgresql (needed by Postgres) and /tmp (useful for storing db dumps temporarily) as emptyDir so we can have readOnlyRootFilesystem as true
+        - mountPath: /var/run/postgresql
+          name: var-run-volume
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - name: var-run-volume
+        emptyDir:
+          sizeLimit: 500Mi
+      - name: tmp-volume
+        emptyDir:
+          sizeLimit: 500Mi
   volumeClaimTemplates:
   - metadata:
       name: postgres18-storage
