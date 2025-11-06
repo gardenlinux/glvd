@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: glvd-database
+  namespace: glvd
   labels:
     app.kubernetes.io/name: glvd
     gardenlinux.io/glvd-component: database
@@ -21,12 +22,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: glvd-database-sa
+  namespace: glvd
 automountServiceAccountToken: false
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: glvd-database
+  namespace: glvd
   labels:
     app.kubernetes.io/name: glvd
     gardenlinux.io/glvd-component: database

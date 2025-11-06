@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: glvd-config
+  namespace: glvd
   labels:
     app.kubernetes.io/name: glvd
     gardenlinux.io/glvd-component: glvd-tracker
@@ -13,6 +14,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: glvd
+  namespace: glvd
   labels:
     app.kubernetes.io/name: glvd
     gardenlinux.io/glvd-component: glvd-tracker
@@ -30,12 +32,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: glvd-api-sa
+  namespace: glvd
 automountServiceAccountToken: false
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: glvd
+  namespace: glvd
   labels:
     app.kubernetes.io/name: glvd
     gardenlinux.io/glvd-component: glvd-tracker
