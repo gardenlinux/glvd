@@ -27,26 +27,6 @@ jobs:
       - name: Update image tags to release
         run: ./update-image-tags.py $VERSION
 
-      - name: Pull images and write SHA tags to YAML
-        run: |
-            IMAGES=(
-            "ghcr.io/gardenlinux/glvd-init"
-            "ghcr.io/gardenlinux/glvd-api"
-            "ghcr.io/gardenlinux/glvd-postgres"
-            "ghcr.io/gardenlinux/glvd-data-ingestion"
-              )
-              ARCHS=("amd64" "arm64")
-              echo "images:" > images-sha.yaml
-              for IMAGE in "${IMAGES[@]}"; do
-                echo "  $IMAGE:" >> images-sha.yaml
-                for ARCH in "${ARCHS[@]}"; do
-                  DIGEST=$(docker buildx imagetools inspect ${IMAGE}:${VERSION} --format '{{json .}}' | jq -r ".manifests[] | select(.platform.architecture==\"$ARCH\") | .digest")
-                  echo "    $ARCH: ${IMAGE}@${DIGEST}" >> images-sha.yaml
-                done
-              done
-        env:
-          VERSION: ${{ env.VERSION }}
-
       - name: Configure git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -55,7 +35,7 @@ jobs:
       - name: Commit version.txt to branch
         run: |
           git checkout -b release-version-${VERSION}
-          git add version.txt deployment deploy-k8s.sh images-sha.yaml
+          git add version.txt deployment deploy-k8s.sh
           git commit -m "chore: set version to ${VERSION}"
           git tag $VERSION
           git push --tags origin release-version-${VERSION}
