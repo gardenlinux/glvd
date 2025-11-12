@@ -1,0 +1,47 @@
+name: Release
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version to Release
+        id: version
+        run: echo "VERSION=$(date --utc +%Y.%m.%d)" >> $GITHUB_ENV
+
+      - name: Set Version
+        run: echo $VERSION > version.txt
+
+      - name: Update image tags to release
+        run: ./update-image-tags.py $VERSION
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit version.txt to branch
+        run: |
+          git checkout -b release-version-${VERSION}
+          git add version.txt deployment deploy-k8s.sh
+          git commit -m "chore: set version to ${VERSION}"
+          git tag $VERSION
+          git push --tags origin release-version-${VERSION}
+
+      - name: Create Release
+        run: |
+          gh release create ${VERSION} --title "Release ${VERSION}" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
