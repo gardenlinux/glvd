@@ -53,8 +53,11 @@ jobs:
 
       - name: Wait for GLVD to be up
         run: |
-          # Taken from https://gist.github.com/rgl/f90ff293d56dbb0a1e0f7e7e89a81f42?permalink_comment_id=5375106#gistcomment-5375106
-          until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)" = "200" ]; do sleep 1; done;
+          # Wait for HTTP 200 and status: UP in response body
+          until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)" = "200" ] && \
+                [ "$(curl -s http://localhost:8080/actuator/health | jq -r .status)" = "UP" ]; do
+            sleep 1
+          done
 
       - run: docker ps
 
