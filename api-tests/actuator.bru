@@ -1,0 +1,21 @@
+meta {
+  name: actuator
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base-URL}}/actuator/health
+  body: json
+  auth: none
+}
+
+tests {
+  test("should be able to get actuator", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("actuator should report status UP", function () {
+    expect(res.body.status).to.equal("UP");
+  });
+}
