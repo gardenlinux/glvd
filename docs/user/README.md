@@ -69,3 +69,15 @@ The GLVD web user interface is built as a visual layer on top of the HTTP API. I
     While the Web UI is ideal for interactive data exploration, it is not intended to serve as a standalone tool for automated vulnerability management. For advanced use cases or integration with other systems, the HTTP API is recommended.
 
 Together, the API and Web UI provide flexible options for accessing and managing vulnerability data, whether you prefer automation or hands-on exploration.
+
+### GLVD Client
+
+Garden Linux provides a command-line client for GLVD, available through the standard APT repository.
+
+- **Installation:**  
+    You can install the client by enabling the `glvd` feature during the build process, or by manually installing the `glvd` package using APT.
+
+- **Usage:**  
+    The client checks for known vulnerabilities based on your Garden Linux version and the packages installed on your system.
+
+This tool makes it easy to stay informed about relevant CVEs directly from your Garden Linux environment.
