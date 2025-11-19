@@ -16,19 +16,28 @@ GLVD aggregates vulnerability data from multiple trusted sources to provide comp
 - **kernel.org:** The official source for Linux kernel-specific CVEs and related security advisories.
 - **CVE Triage Data from the Garden Linux Team:** Expert-reviewed data curated specifically for Garden Linux.
 
+The following diagram illustrates how GLVD collects and processes vulnerability data from various trusted sources.
+
 ```mermaid
 flowchart TD
-    NVD["NIST National Vulnerability Database (NVD)"]
-    DebianSec["Debian Security Tracker"]
-    Changelogs["Debian Package Changelogs"]
-    Kernel["kernel.org"]
-    GLTeam["CVE Triage Data from the Garden Linux Team"]
+    subgraph Cloud["GLVD Data Sources"]
+        NVD["NIST National Vulnerability Database"]
+        DEB["Debian Security Tracker"]
+        CHANGELOGS["Debian Changelogs"]
+        KERNEL["kernel.org (upstream)"]
+        TRIAGE["Garden Linux CVE Triage"]
+        INGESTION["Ingestion Process"]
+        DB["GLVD Database"]
+        SERVER["GLVD API Server"]
+    end
 
-    NVD --> GLVDDB["GLVD Database"]
-    DebianSec --> GLVDDB
-    Changelogs --> GLVDDB
-    Kernel --> GLVDDB
-    GLTeam --> GLVDDB
+    NVD -- Ingests --> INGESTION
+    DEB -- Ingests --> INGESTION
+    CHANGELOGS -- Ingests --> INGESTION
+    KERNEL -- Ingests --> INGESTION
+    INGESTION -- Updates daily --> DB
+    TRIAGE -- Enriches --> DB
+    DB -- Serves Data --> SERVER
 ```
 
 It is important to understand that GLVD does not perform direct scanning of system images or analyze binary files. Instead, it relies on the vulnerability status as reported by the Debian Security Tracker and other upstream sources. As a result, there may occasionally be false positives—packages flagged as vulnerable even if they are not present or exploitable in your specific environment. Always review reported vulnerabilities in context to ensure accurate risk assessment.
