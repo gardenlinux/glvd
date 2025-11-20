@@ -8,6 +8,8 @@ Use this guide to get started with GLVD and ensure your Garden Linux deployments
 
 ## Concepts
 
+### Data Sources
+
 GLVD aggregates vulnerability data from multiple trusted sources to provide comprehensive and up-to-date information. The primary sources include:
 
 - **NIST National Vulnerability Database (NVD):** A widely recognized repository of standardized vulnerability information.
@@ -40,7 +42,11 @@ flowchart TD
     DB -- Serves Data --> SERVER
 ```
 
-## Limitations of GLVD
+### Triage Data
+
+The Garden Linux team actively reviews CVEs affecting Garden Linux and enriches vulnerability data with additional context. This may include marking issues as false positives, identifying vulnerabilities that are not relevant to typical Garden Linux use cases, or noting when a patched version will be available in an upcoming minor release. This triage process helps users better understand the real impact of reported vulnerabilities on their systems.
+
+### Limitations of GLVD
 
 GLVD is designed to provide vulnerability information based on trusted external sources, but there are important limitations to be aware of:
 
