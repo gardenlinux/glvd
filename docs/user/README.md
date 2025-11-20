@@ -40,7 +40,17 @@ flowchart TD
     DB -- Serves Data --> SERVER
 ```
 
-It is important to understand that GLVD does not perform direct scanning of system images or analyze binary files. Instead, it relies on the vulnerability status as reported by the Debian Security Tracker and other upstream sources. As a result, there may occasionally be false positives—packages flagged as vulnerable even if they are not present or exploitable in your specific environment. Always review reported vulnerabilities in context to ensure accurate risk assessment.
+## Limitations of GLVD
+
+GLVD is designed to provide vulnerability information based on trusted external sources, but there are important limitations to be aware of:
+
+- **No Binary Scans:**  
+    GLVD does not scan your system images or analyze binary files directly. Instead, it reports vulnerabilities based on information from trusted sources like the Debian Security Tracker. This means GLVD checks which packages are known to be vulnerable, but it does not inspect your actual files or running systems. Sometimes, this can lead to false positives. GLVD might list a vulnerability for a package even if that package is not installed or not exploitable in your environment. Always review the reported vulnerabilities in the context of your own systems to assess real risks.
+
+- **Based on Source Packages:**  
+    The Debian Security Tracker reports vulnerabilities for Debian **source packages**. A single source package can produce multiple binary packages, but not all of these binaries are necessarily present in Garden Linux. As a result, GLVD may sometimes report vulnerabilities for binary packages that are not included or used in your environment. This is a fundamental limitation and can lead to false positives. Always review reported vulnerabilities in the context of your actual package set.
+
+Familiarize yourself with these limitations to accurately interpret GLVD reports and assess risks in the context of your own systems.
 
 ## User Interfaces
 
