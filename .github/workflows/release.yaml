@@ -77,6 +77,6 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create ${VERSION} --title "Release ${VERSION}" --generate-notes
+          gh release create ${VERSION} --title "Release ${VERSION}" --notes "Release ${VERSION}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
