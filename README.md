@@ -1,61 +1,78 @@
-# Garden Linux Vulnerability Database
+# Garden Linux Vulnerability Database (GLVD)
 
-This repository contains the central entrypoint to the Garden Linux Vulnerability Database (glvd) project.
-It implements an application to track security vulnerabilities in Garden Linux.
+GLVD (Garden Linux Vulnerability Database) is an application for tracking security issues in Garden Linux. It combines information from public resources such as the [NIST National Vulnerability Database (NVD)](https://nvd.nist.gov/), the [Debian Security Tracker](https://security-tracker.debian.org/), and [kernel.org](https://kernel.org/) with our own triage information. GLVD helps you stay informed about vulnerabilities affecting Garden Linux.
 
-> [!NOTE]  
-> GLVD is work in progress and does not provide a stable api yet.
+## Using GLVD
 
-## Components
+[Main entrypoint](https://security.gardenlinux.org)
 
-The code of glvd is located in multiple repositories inside the `gardenlinux` org on GitHub.
+[API Documentation](https://github.com/gardenlinux/glvd-api)
 
-glvd is implemented in various components.
+[User Guide](./docs/user/README.md)
 
-### [Postgres container image](https://github.com/gardenlinux/glvd-postgres)
+## Features
 
-A postgres database is the central component of glvd.
-This repository contains a Containerfile to run this database.
+- Aggregates vulnerability data from multiple trusted sources
+- Tracks and triages security issues specific to Garden Linux
+- Provides a REST API and web interface for querying vulnerabilities
+- Supports automated data ingestion and schema management
+- Easily deployable via Kubernetes or Compose
+
+## Architecture & Components
+
+GLVD is composed of several modular components, each maintained in its own repository within the `gardenlinux` GitHub organization:
+
+### [Postgres Container Image](https://github.com/gardenlinux/glvd-postgres)
+
+PostgreSQL database for storing vulnerability data. Includes a Containerfile for easy deployment.
 
 ### [Data Ingestion](https://github.com/gardenlinux/glvd-data-ingestion)
 
-Data ingestion creates the required database schema and imports data from external sources such as NVD and the debian security tracker.
+Automates schema creation and imports vulnerability data from external sources (NVD, Debian Security Tracker, kernel.org).
 
 ### [Backend API](https://github.com/gardenlinux/glvd-api)
 
-The backend api exposed an HTTP API to get data out of the database.
+Exposes an HTTP REST API for accessing vulnerability data. Also includes a simple web interface for browsing and searching vulnerabilities.
 
-It also contains a simple web interface.
+### [Client CLI Tool](https://github.com/gardenlinux/package-glvd)
 
-### [Client cli tool](https://github.com/gardenlinux/package-glvd)
+Command-line client available via the Garden Linux APT repository for interacting with GLVD.
 
-The client is available in the Garden Linux APT repo.
+## Getting Started
 
-## Deploy your own instance
+### Deploy Your Own Instance
 
-### Kubernetes
+#### Kubernetes
 
-Manifest files for a kubernetes deployment are located in [deployment/k8s](deployment/k8s).
-Those deployments are used to create setup of glvd on a [Gardener](https://gardener.cloud) cluster.
+Manifest files for deploying GLVD on Kubernetes are available in [`deployment/k8s`](deployment/k8s). These can be used to set up GLVD on a [Gardener](https://gardener.cloud) cluster.
 
-See the `deploy-k8s.sh` script for details.
+To deploy, see the `deploy-k8s.sh` script for step-by-step instructions.
 
-### [Compose Spec](https://compose-spec.io)
+#### Compose Spec
 
-A setup for [Compose](https://podman-desktop.io/docs/compose/running-compose) can be found in `deployment/compose/compose.yaml`.
+A Compose setup is provided in [`deployment/compose/compose.yaml`](deployment/compose/compose.yaml).
 
-Example command to start locally:
+To start GLVD locally:
 
 ```bash
 podman compose --file deployment/compose/compose.yaml up
 ```
 
-This will give you a running instance of the database and the backend, but the database has no schema and no data.
+This will launch the database and backend API. Note: The database will be empty initially.
 
-To init the db, you may run something like:
+To initialize the database schema and import data:
 
 ```bash
 podman run -it --rm --network=compose_glvd --env PGHOST=glvd-postgres ghcr.io/gardenlinux/glvd-init:latest
 ```
 
-Note that this will wipe the existing database, so in case you want to keep data be sure to back it up.
+**Warning:** This operation will reset the database. Backup your data if needed.
+
+## Contributing
+
+We welcome contributions! Please see the individual component repositories for and open issues.
+
+## Support & Documentation
+
+- [GLVD API Documentation](https://github.com/gardenlinux/glvd-api)
+- For questions or support, open an issue in the relevant repository.
