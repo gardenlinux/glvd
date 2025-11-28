@@ -36,7 +36,7 @@ sleep 30
 if kubectl --namespace glvd get po | grep -q init-pg ; then
     echo 'init-pg container exists, skipping init for now'
 else
-    kubectl --namespace glvd run init-pg --image=ghcr.io/gardenlinux/glvd-init:latest --restart=Never --env=PGHOST=glvd-database-0.glvd-database --env=PGPASSWORD="$DB_PASSWORD"
+    kubectl --namespace glvd run init-pg --image=ghcr.io/gardenlinux/glvd-init:2025.11.28 --restart=Never --env=PGHOST=glvd-database-0.glvd-database --env=PGPASSWORD="$DB_PASSWORD"
     echo 'give init some time to complete'
     sleep 60
 fi

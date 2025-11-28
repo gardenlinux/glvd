@@ -65,7 +65,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - image: ghcr.io/gardenlinux/glvd-api:latest
+      - image: ghcr.io/gardenlinux/glvd-api:2025.11.28
         imagePullPolicy: Always
         name: glvd-api
         securityContext:
