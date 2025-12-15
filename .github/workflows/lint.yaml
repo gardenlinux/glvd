@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - uses: azure/k8s-lint@v3
+      - uses: azure/k8s-lint@6aefe5066f95e73d2b140d8835cc95583b886989 # v3.0.1
         with:
            manifests: |
               deployment/k8s
