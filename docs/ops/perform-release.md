@@ -36,6 +36,11 @@ export KUBECONFIG=/path/to/prod-cluster.yaml
 GLVD_VERSION_TODAY=$(date +%Y.%m.%d)
 echo $GLVD_VERSION_TODAY
 
+# Test if release images exist
+podman manifest inspect ghcr.io/gardenlinux/glvd-postgres:$GLVD_VERSION_TODAY > /dev/null ; echo $?
+podman manifest inspect ghcr.io/gardenlinux/glvd-api:$GLVD_VERSION_TODAY > /dev/null ; echo $?
+podman manifest inspect ghcr.io/gardenlinux/glvd-data-ingestion:$GLVD_VERSION_TODAY > /dev/null ; echo $?
+
 # Migrate the DB schema to the latest version
 # Can't use dots in the name, so use date with dashes instead
 kubectl -n glvd run db-migration-rel-$(date +%Y-%m-%d) --restart='Never' --image=ghcr.io/gardenlinux/glvd-data-ingestion:$GLVD_VERSION_TODAY --env=DATABASE_URL=postgres://glvd:$(kubectl -n glvd get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)@glvd-database-0.glvd-database:5432/glvd -- python3 /usr/local/src/bin/migrate-all
