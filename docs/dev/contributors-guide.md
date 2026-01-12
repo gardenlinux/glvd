@@ -46,8 +46,9 @@ Bring up the local environment
 podman compose --file deployment/compose/compose.yaml up
 ```
 
-- Add `-d` to run in the background. The compose setup includes a recent snapshot of the GLVD database.
-- Stop the backend if you want to run a locally built JAR on port 8080: `podman stop compose-glvd-1`
+Add `-d` to run in the background, if desired.
+
+The compose setup includes a recent snapshot of the GLVD database.
 
 That's it — Podman will start the database and backend containers for local development.
 
