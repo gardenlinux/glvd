@@ -2,57 +2,60 @@
 
 ## Project Overview
 
-The code of glvd is located in multiple repositories inside the `gardenlinux` org on GitHub.
-
-glvd is implemented in various components.
+The GLVD code is spread across several repositories in the `gardenlinux` GitHub organization. Each repository implements one part of the system.
 
 ### [gardenlinux/glvd](https://github.com/gardenlinux/glvd)
 
-The `gardenlinux/glvd` repo is the main entry point to GLVD.
-It contains project-wide docs, and infrastructure definitions for deploying GLVD instances both locally and in cloud environments.
+This is the main entry point for GLVD. It contains project-wide documentation and infrastructure for deploying GLVD locally and in cloud environments.
 
 ### [`gardenlinux/glvd-postgres`](https://github.com/gardenlinux/glvd-postgres)
 
-A postgres database is the central component of glvd.
-This repository contains a `Containerfile` to run this database.
+This repository provides the PostgreSQL container image used by GLVD.
 
 > [!IMPORTANT]  
-> This container image includes the [postgresql-debversion](https://salsa.debian.org/postgresql/postgresql-debversion) extension which is vital to GLVD.
-> It allows to compare debian package version numbers.
-> This is the reason why we absolutely need a postgres db to run glvd, and why this needs to run on top of a debian-based container image.
+> The image includes the [postgresql-debversion](https://salsa.debian.org/postgresql/postgresql-debversion) extension (used to compare Debian package version numbers). Because of this dependency, the database image must be based on a Debian-style distribution.
 
 ### [`gardenlinux/glvd-data-ingestion`](https://github.com/gardenlinux/glvd-data-ingestion)
 
-Data ingestion creates the required database schema and imports data from external sources such as NVD and the debian security tracker.
+Handles creation of the database schema and imports data from external sources (for example NVD and the Debian security tracker).
 
 ### [`https://github.com/gardenlinux/glvd-api`](https://github.com/gardenlinux/glvd-api)
 
-The backend api exposed an HTTP API to get data out of the database.
-
-It also contains a simple web interface.
+The backend service. It exposes an HTTP API to read data from the database and also contains a simple web UI.
 
 ### [`https://github.com/gardenlinux/package-glvd`](https://github.com/gardenlinux/package-glvd)
 
-The cli client is available in the Garden Linux APT repo.
+Provides the GLVD CLI client packaged for the Garden Linux APT repository.
 
 ## Setup a Local Dev Env
 
-### On macOS, using podman (desktop/machine)
+### On macOS — using Podman (Desktop / Machine)
 
-- Make sure [podman is setup properly](https://podman.io/docs/installation)
-- Get the suitable [docker compose](https://github.com/docker/compose) binary and put it into your `PATH`
-  - Running `podman compose` will use a 'provider' for working with compose files
-  - By default, it makes use of https://github.com/containers/podman-compose, which does not support all features needed by GLVD as of december 2024
-  - If the `docker-compose` binary is in your `PATH`, `podman compose` will use that to crate containers
-  - Using this method, you can use podman to run GLVD
+Prerequisites
+- Install Podman (podman.io). If using Podman Machine, run `podman machine init` and `podman machine start`.
+- Download a compatible docker-compose (Compose v2) CLI and put it in your PATH. This lets Podman reuse it for Compose files.
 
-With this setup, inside your local clone of the `gardenlinux/glvd` repo, you should be able to run `podman compose --file deployment/compose/compose.yaml up` which will bring up a local glvd environment including a recent snapshot of the database.
+How Podman Compose works
+- By default `podman compose` uses the provider containers/podman-compose, which (as of Dec 2024) lacks some features GLVD needs.
+- If a `docker-compose` binary is available in your PATH, `podman compose` will use that binary to create containers — this is the recommended approach for GLVD.
+
+Bring up the local environment
+- From the root of your local `gardenlinux/glvd` checkout run:
+
+```
+podman compose --file deployment/compose/compose.yaml up
+```
+
+- Add `-d` to run in the background. The compose setup includes a recent snapshot of the GLVD database.
+- Stop the backend if you want to run a locally built JAR on port 8080: `podman stop compose-glvd-1`
+
+That's it — Podman will start the database and backend containers for local development.
 
 You can check this using the Spring Boot Actuator endpoint:
 
 ```
 $ curl http://localhost:8080/actuator/health
-{"status":"UP"}
+{"groups":["liveness","readiness"],"status":"UP"}
 ```
 
 Congratulations, you have a running instance of GLVD.
@@ -66,14 +69,11 @@ aaaaaaaaaaaa  ghcr.io/gardenlinux/glvd-postgres:latest         postgres         
 bbbbbbbbbbbb  ghcr.io/gardenlinux/glvd-api:latest              /jre/bin/java -ja...  2 weeks ago  Up 3 minutes            0.0.0.0:8080->8080/tcp  compose-glvd-1
 ```
 
-We have two long-running containers:
-The postgres db, and our backend.
-
-The db exposes the default port `5432`, which is useful for development purposes.
-You may use postgres client applications to inspect, edit, backup or restore the database as needed.
-In a production deployment, the database is not exposed to the outside world.
-
-The backend exposed port `8080` as we have already seen above in our `curl` command.
+- Two long‑running containers:
+    - Postgres database (exposes port `5432` for local development)
+    - Backend service (exposes port `8080`)
+- For development you can connect to the database on `localhost:5432` with tools like `psql`, pgAdmin, or any PostgreSQL client to inspect, edit, backup, or restore data.
+- In production the database is not exposed externally — it is only accessible to internal services.
 
 ### Exploring the API
 
@@ -85,21 +85,61 @@ It is documented [here](https://gardenlinux.github.io/glvd-api/).
 
 After getting familiar with the API, you can have a look at the [example requests provided in the glvd-api repo](https://github.com/gardenlinux/glvd-api/tree/main/api-examples).
 
+When you are done, stop the compose setup by running:
+
+```
+podman compose --file deployment/compose/compose.yaml down --volumes
+```
+
 ### Make changes to the backend and try them out
 
 Prerequisites:
 - JDK 25 (SapMachine preferred, download and install from https://sapmachine.io)
   - Be sure to install the *JDK* version, the *JRE* is not enough
 
-Run `./gradlew bootJar` inside the `glvd-api` repo checkout to compile the backend.
+The backend is located in the `glvd-api` repository.
 
-Run `podman stop compose-glvd-1` to stop the backend container from running.
-This allows your locally built backend to make use of the port `8080` on your machine.
+It has it's own database setup for convenience.
 
-Run `java -jar build/libs/glvd-dev.jar` to start the backend version you've just built.
-It should start up and connect to the database automatically.
+> [!TIP]
+> There are two database setups in `glvd-api`.
+> One is optimized for unit tests, it contains a minimal set of data needed to pass the tests.
+> The other setup is intended for usage and runs with a full dump of the glvd database to give you a realistic user experience.
+> Both use different ports for postgres, so they can run at the same time.
+> Unit-tests use port `9876`, while for running the app the db uses postgres' default port `5432`.
 
-Run `curl http://localhost:8080/actuator/health` again and observe the log of your backend instance.
+#### Running the Application Locally
+
+Inside your clone of `glvd-api`, follow those steps:
+
+1. Get a dump of the Database (this needs the GitHub `gh` cli and `jq`)
+
+```bash
+./download-db-dump.sh
+```
+
+2. Start the application database:
+
+```bash
+./start-db-for-app.sh
+```
+
+3. Build and run the Spring Boot app:
+
+```bash
+./gradlew bootRun
+```
+
+4. After startup, check readiness:
+
+```
+curl http://localhost:8080/actuator/health
+# Should return status code 200
+```
+
+5. Open http://localhost:8080 in your web browser to use the UI
+
+Observe the logs of your backend instance.
 It should say something like `Initializing Servlet 'dispatcherServlet'`.
 
 Congratulations, you compiled the GLVD backend on your own, and are running it on your machine.
@@ -108,12 +148,13 @@ You can now make changes to the source code, stop, rebuild and restart your inst
 ### Reading the backend source code
 
 The backend is implemented in Java using [Spring Boot](https://docs.spring.io/spring-boot/index.html).
-Some basic understanding of both Java and is therefore required to work on the backend.
+Some basic understanding of both Java and Spring Boot is therefore required to work on the backend.
 
 The `glvd-api` project implements both the HTTP API, and a very basic web user interface.
 
-As of January 2026, the whole backend is read-only by design.
+As of January 2026, the whole backend is read-only by design to ensure data integrity and prevent unauthorized modifications.
 It does not include any endpoints or ui elements for adding, updating or deleting data.
+This design decision aligns with the current use cases of GLVD, and there are no immediate plans to introduce write capabilities. However, this may be revisited in the future based on evolving project requirements.
 
 The backend needs a database instance to start.
 This is already there if you followed the steps described before.
@@ -121,12 +162,11 @@ This is already there if you followed the steps described before.
 It makes use of the `JpaRepository` class provided by Spring to ease database access.
 You can find the `*Repository` classes by their name.
 
-The `GlvdService` class is the ui independent part which provides functions to be used both by the web ui and by the HTTP api.
-Mostly it only bridges between the `*Repository` classes that communicate with the db and the ui/api layer.
+The `GlvdService` class is the UI-independent part which provides functions to be used both by the web UI and by the HTTP API. It acts as a bridge between the database access layer (via `*Repository` classes) and the presentation layer (UI/API).
 
 The HTTP api is implemented as a simple `RestController`.
 
-The web ui is built using [thymeleaf](https://www.thymeleaf.org), which is a templating language that is built into Spring Boot.
+The web UI is built using [Thymeleaf](https://www.thymeleaf.org), which is a templating language that is built into Spring Boot. For contributors unfamiliar with Thymeleaf, you can refer to the [official Thymeleaf documentation](https://www.thymeleaf.org/documentation.html) to get started.
 You can find the templates in `src/main/resources/templates`, and the code for populating them in `src/main/java/io/gardenlinux/glvd/UiController.java`.
 
 The existing code should be relatively easy to adapt to changing requirements.
@@ -200,55 +240,41 @@ Inside the local checkout of `glvd-api`, the tests can be run with this:
 
 ### Understanding the data ingestion process
 
-The data ingestion process is required to get a functioning glvd instance.
+The data ingestion process is required to run a functioning GLVD instance. It aggregates and reconciles information from several public sources — for example NIST, the Debian Security Tracker, and the kernel.org vulnerabilities repository — to build the database GLVD uses.
 
-In short, it collects and combines data from various public sources:
-
-- data from nist
-- data from debian security tracker
-- data from kernel.org vulns repo
-
-Running the ingestion from scratch takes long and might fail due to rate limiting.
-This is why container images with existing database dumps are published for glvd.
+Running a full ingestion from scratch can be slow and is prone to failures due to rate limiting from those upstream services. To avoid that overhead, we publish container images that include prebuilt database dumps so you can get a usable GLVD instance quickly.
 
 ### Gardener Setup for GLVD
 
-For running dev/test/prod environments, we make use of Gardener clusters.
+For testing and production we deploy GLVD to Gardener clusters. The Kubernetes manifests are in the repository at https://github.com/gardenlinux/glvd/tree/main/deployment/k8s, and deployment can be automated with the helper script at https://github.com/gardenlinux/glvd/blob/main/deploy-k8s.sh.
 
-The [manifests are in the glvd/glvd repo](https://github.com/gardenlinux/glvd/tree/main/deployment/k8s), which also includes [a shell script](https://github.com/gardenlinux/glvd/blob/main/deploy-k8s.sh) that does the deployment.
+Note: this setup may change in the future (for example, we may adopt Helm).
 
-> [!NOTE]
-> This setup might change in the future, for example by making use of helm
+A healthy GLVD cluster typically runs a stateful Postgres pod together with a backend pod. The database is managed by a StatefulSet and backed by a PersistentVolumeClaim, while the ingestion process runs as a cronjob to update the DB. Container images for the dev cluster are updated via GitHub Actions in the glvd-api and glvd-postgres repositories, so clusters always run the latest code from the `main` branch of those repos.
+The prod cluster is updated by a deliberate release process which is described in [perform-release.md](../ops/perform-release.md).
 
-A running cluster with glvd setup will look like this:
+You can inspect the cluster with kubectl; a representative output looks like this:
 
 ```
-$ kubectl get pods,jobs,sts,pvc
+$ kubectl -n glvd get pods,jobs,sts,pvc
 NAME                                READY   STATUS      RESTARTS   AGE
-pod/glvd-5ffd969b55-cdnb8           1/1     Running     0          14h
-pod/glvd-database-0                 1/1     Running     0          14h
-pod/glvd-ingestion-29009250-lqqlg   0/1     Completed   0          127m
+pod/glvd-6cddff8cb8-tbcvz           1/1     Running     0          3d13h
+pod/glvd-database-0                 1/1     Running     0          3d13h
+pod/glvd-ingestion-29465730-nv45h   0/1     Completed   0          3d7h
+pod/glvd-ingestion-29470050-6klgd   0/1     Completed   0          7h39m
 
 NAME                                STATUS     COMPLETIONS   DURATION   AGE
-job.batch/glvd-ingestion-29006370   Complete   1/1           3m50s      2d2h
-job.batch/glvd-ingestion-29007810   Complete   1/1           4m33s      26h
-job.batch/glvd-ingestion-29009250   Complete   1/1           3m36s      127m
+job.batch/glvd-ingestion-29464290   Complete   1/1           6m13s      4d7h
+job.batch/glvd-ingestion-29465730   Complete   1/1           6m36s      3d7h
+job.batch/glvd-ingestion-29470050   Complete   1/1           6m19s      7h39m
 
 NAME                             READY   AGE
-statefulset.apps/glvd-database   1/1     43d
+statefulset.apps/glvd-database   1/1     63d
 
-NAME                                                     STATUS   VOLUME                          CAPACITY   ACCESS MODES   STORAGECLASS
-persistentvolumeclaim/postgres-storage-glvd-database-0   Bound    pv-shoot--gardnlinux--glvd-xy   5Gi        RWO            default
+NAME                                                       STATUS   VOLUME         CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/postgres-backup-glvd-database-0      Bound    pv-shoot--xx   5Gi        RWO            default        <unset>                 63d
+persistentvolumeclaim/postgres18-storage-glvd-database-0   Bound    pv-shoot--yy   5Gi        RWO            default        <unset>                 63d
 ```
-
-We have two long running pods, one with the postgres db, and one with the backend.
-
-The db is controlled by a stateful set and has a persistent volume attached.
-
-We also have short-lived pods to update the db via the data ingestion container.
-This is controlled via a cronjob that runs daily.
-
-Note that the container images are automatically updated via github actions ([glvd-api](https://github.com/gardenlinux/glvd-api/blob/497ce994f97fc241be063cecb7bbb837b6413714/.github/workflows/ci.yaml#L155), [glvd-postgres](https://github.com/gardenlinux/glvd-postgres/blob/85042bd6e413bd0df265ab80568d484dd9ebbefa/.github/workflows/build-postgres-container.yml#L89)), so the cluster is always running the very latest version of glvd.
 
 ### Inspect the db in the cluster
 
