@@ -61,7 +61,3 @@ This process ensures coordinated releases, consistent deployments, and automated
 - Use GitHub Actions for all build, tag, and publish steps.
 - Use branch protection and required checks in the release repo.
 - Automate manifest updates and release notes generation.
-
----
-
-**This schema ensures all GLVD components are versioned, compatible, and easily deployable, with a clear and automated release process using CalVer.**
