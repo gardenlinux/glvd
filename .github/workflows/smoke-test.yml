@@ -1,0 +1,44 @@
+name: CI
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+    - name: Setup Node.js
+      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+      with:
+        node-version: '24'
+
+    - name: Install Bruno CLI
+      run: npm install -g @usebruno/cli
+
+    - name: Compose Up
+      run: |
+        docker compose --file deployment/compose/compose.yaml up --detach
+
+    - name: Wait for GLVD to be up
+      run: |
+        # Wait for HTTP 200 and status: UP in response body
+        until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)" = "200" ] && \
+              [ "$(curl -s http://localhost:8080/actuator/health | jq -r .status)" = "UP" ]; do
+          sleep 1
+        done
+
+    - run: docker ps
+
+    - name: Run API Tests
+      run: bru run --env ci --reporter-html results.html
+      working-directory: api-tests
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      with:
+        name: test-results
+        path: api-tests/results.html
