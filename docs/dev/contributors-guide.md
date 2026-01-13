@@ -19,11 +19,11 @@ This repository provides the PostgreSQL container image used by GLVD.
 
 Handles creation of the database schema and imports data from external sources (for example NVD and the Debian security tracker).
 
-### [`https://github.com/gardenlinux/glvd-api`](https://github.com/gardenlinux/glvd-api)
+### [`gardenlinux/glvd-api`](https://github.com/gardenlinux/glvd-api)
 
 The backend service. It exposes an HTTP API to read data from the database and also contains a simple web UI.
 
-### [`https://github.com/gardenlinux/package-glvd`](https://github.com/gardenlinux/package-glvd)
+### [`gardenlinux/package-glvd`](https://github.com/gardenlinux/package-glvd)
 
 Provides the GLVD CLI client packaged for the Garden Linux APT repository.
 
