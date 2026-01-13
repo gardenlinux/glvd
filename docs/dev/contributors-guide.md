@@ -239,6 +239,26 @@ Inside the local checkout of `glvd-api`, the tests can be run with this:
 ./gradlew test
 ```
 
+The test database schema and its sample data are stored in `src/test/resources/test-data`. Keep those files in sync with the actual schema: whenever the real schema changes, update the test schema files so the tests remain valid.
+
+Test data should be realistic but minimal. The tests in `src/test/java/io/gardenlinux/glvd/GlvdControllerTest.java` depend on specific records and values in these files, so add only the minimal data needed for new test cases and update the test schema when required.
+
+#### REST docs 
+
+GlvdControllerTest uses [Spring REST Docs](https://spring.io/projects/spring-restdocs) to produce the API documentation (see https://gardenlinux.github.io/glvd-api/). This is a hybrid, test-driven workflow: the tests generate reusable snippets (requests and responses), but the final documentation text is written and maintained by developers — it is not fully automated like Swagger/OpenAPI.
+
+To edit the docs
+- Modify the AsciiDoc source at `src/docs/asciidoc/index.adoc`.
+- AsciiDoc is used by Spring REST Docs and is similar to Markdown; see the [AsciiDoc documentation](https://asciidoctor.org) for syntax details.
+
+Typical workflow
+- Update or add tests in `GlvdControllerTest` so generated snippets reflect the API.
+- Run the tests to regenerate snippets.
+- Edit `src/docs/asciidoc/index.adoc` to assemble the snippets and write the explanatory prose.
+- Rebuild the docs (`./gradlew asciidoctor`) and verify the output in `build/docs/asciidoc/index.html`.
+
+Keep snippets and prose in sync: when the API changes, update tests (to regenerate snippets) and the AsciiDoc files (to update the written documentation).
+
 ### Understanding the data ingestion process
 
 The data ingestion process is required to run a functioning GLVD instance. It aggregates and reconciles information from several public sources — for example NIST, the Debian Security Tracker, and the kernel.org vulnerabilities repository — to build the database GLVD uses.
@@ -314,6 +334,10 @@ This container is used in the "Dump GLVD Postgres Snapshot to sql file" workflow
 #### 02 - Dump GLVD Postgres Snapshot to sql file
 
 This workflow runs a full ingestion job from scratch and exports a postgres dump file which can be imported.
+This dump is used to create working glvd instances quickly.
+It is possible to run the full ingestion process locally, but this takes time and is error prone.
+
+This workflow runs on schedule to keep an updated dump of the glvd database available at all times.
 
 #### 02.5 - Dump GLVD Postgres Snapshot to sql file (incremental)
 
@@ -327,6 +351,21 @@ This workflow builds and pushes the `gardenlinux/glvd-init` container image whic
 #### 03.5 - Build and Push Container to init GLVD Postgres DB (Incremental)
 
 Same as above but makes use of "02.5 - Dump GLVD Postgres Snapshot to sql file (incremental)".
+
+#### 97 - Generate Source Manifests
+
+This workflow generates text files containing a list of source packages in a specific Garden Linux image.
+This is required for [the image-based view](https://github.com/gardenlinux/glvd/issues/189).
+It has to be run for new releases of Garden Linux.
+
+#### 98 - Build and Push Changelogs Downloader Container
+
+Builds and pushes a container image for downloading debian changelog files.
+Needed for [addressing a class of false positive findings in glvd](https://github.com/gardenlinux/glvd/issues/149).
+
+#### 99 - Test Data Ingestion Container
+
+Workflow to test/debug the container built in "01 - Build and Push Data Ingestion Container".
 
 ### glvd client
 
