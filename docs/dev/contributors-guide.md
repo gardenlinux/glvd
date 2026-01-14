@@ -167,29 +167,35 @@ The `GlvdService` class is the UI-independent part which provides functions to b
 
 The HTTP api is implemented as a simple `RestController`.
 
-The web UI is built using [Thymeleaf](https://www.thymeleaf.org), which is a templating language that is built into Spring Boot. For contributors unfamiliar with Thymeleaf, you can refer to the [official Thymeleaf documentation](https://www.thymeleaf.org/documentation.html) to get started.
+The web UI is built using [Thymeleaf](https://www.thymeleaf.org), which is a templating language that is built into Spring Boot.
+For contributors unfamiliar with Thymeleaf, you can refer to the [official Thymeleaf documentation](https://www.thymeleaf.org/documentation.html) to get started.
 You can find the templates in `src/main/resources/templates`, and the code for populating them in `src/main/java/io/gardenlinux/glvd/UiController.java`.
 
 The existing code should be relatively easy to adapt to changing requirements.
 
+The api is extensively tested in `GlvdControllerTest`, which should allow to catch potential regressions introduced by changes in the code or the DB schema.
+
 ### Database schema
 
-GLVD's database schema is described [here](https://github.com/gardenlinux/glvd/blob/main/docs/03_ingestion.md#database).
+GLVD's database schema is described [here](./data-model.md).
 
-### Important VIEWs
+#### Tables
 
-GLVD makes use of VIEWs to provide much of the data needed by the backend.
-The general idea is to solve things in the database as far as possible without resorting to procedural programming in the db.
-If logic in the backend can be replaced by an SQL VIEW, this should be done.
+- `cve_context` — Stores triage and context information for CVEs, including resolution status, intended use case, descriptive notes, and the related Garden Linux version.
+- `debsrc` — Contains source package metadata for each Garden Linux distribution (package name, version, last modification date).
+- `dist_cpe` — Maps Garden Linux distributions to CPE identifiers (vendor, product, version, codename).
+- `nvd_cve` — Stores CVE data ingested from the NVD, including the raw JSON payload and the last modification timestamp.
 
-We have the following views in GLVD:
+#### Views
 
-- `sourcepackage` provides information on which package in which version is in a specific Garden Linux release
-- `cve_with_context` provides additional context (i.e. 'triage') for a CVE
-- `sourcepackagecve` provides CVEs affecting a source package in a specific version in a Garden Linux release
-- `cvedetails` provides details of a CVE such as its CVSS Scores
-- `nvd_exclusive_cve` provides a list of CVE that only appear in NVD but not in the debian security tracker
-- `nvd_exclusive_cve_matching_gl` like `nvd_exclusive_cve`, but only with items that fuzzy-match any package in Garden Linux
+- `imagesourcepackagecve` — Shows which CVEs affect which packages in which Garden Linux images, including vulnerability status, scores, and vector strings.
+- `kernel_cvedetails` — Provides detailed information about kernel-related CVEs: context, LTS versions, fixed versions, scores, and descriptions.
+- `cvedetails` — Aggregates detailed CVE information, including context, affected distributions, vulnerable packages, scores, and descriptions.
+- `sourcepackagecve` — Lists CVEs affecting source packages in any package available in the Garden Linux apt repo, along with vulnerability status and scores.
+- `sourcepackagecve_anyimage` — Same as `sourcepackagecve`, but with a filter to include only packages that are installed in at least one Garden Linux disk image.
+- `triage` — Displays triage information for CVEs, combining resolution status, use case, description, and linked NVD data.
+- `kernel_cve` — Shows kernel-related CVEs with package, version, LTS version, vulnerability status, and scores.
+- `sourcepackage` — Lists all source packages and their versions for each Garden Linux distribution.
 
 ### Inspect the db locally
 
