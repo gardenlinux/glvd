@@ -15,7 +15,7 @@ gh workflow run release.yaml --repo gardenlinux/glvd-postgres
 gh workflow run release.yaml --repo gardenlinux/glvd-data-ingestion
 ```
 
-## Perform release of the main project
+### Check releases
 
 Check that all component's release images exist:
 
@@ -41,6 +41,24 @@ for img in "${IMAGES[@]}"; do
   fi
 done
 ```
+
+If the script succeeds, it will print only the version number. If any image is missing, an error message will be displayed and the script will exit with a non-zero status.
+
+#### Error handling
+
+Release failures are rare, but OCI image pushes can occasionally fail.
+
+If a release fails in any repository, follow these steps to recover:
+
+1. If a simple re-run does not resolve the issue, apply the necessary fix to the `main` branch.
+2. Delete the corresponding GitHub release.
+3. Remove the associated git tag for the failed release.
+4. Delete the release branch.
+5. Re-run the release workflow.
+
+This ensures a clean state before attempting the release again.
+
+## Perform release of the main project
 
 After all components have been successfully released, you can release the main glvd project:
 
