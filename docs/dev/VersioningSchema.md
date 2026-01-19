@@ -25,7 +25,7 @@ We have the following artifacts that need to be aligned:
     - Each repository creates a new release, building and pushing its image with a CalVer tag (e.g., `2025.11.11`).
 
 2. **Central Manifest Update**  
-    - In the central `gardenlinux/glvd` repository, the deployment YAML files (Kubernetes and Docker Compose) are updated to reference the new CalVer-tagged images using the `update-image-tags.py` script.
+    - In the central `gardenlinux/glvd` repository, the deployment YAML files (Kubernetes and Docker Compose) are updated to reference the new CalVer-tagged images using the `scripts/update-image-tags.py` script.
 
 3. **Production Deployment**  
     - The updated deployment manifests are applied to the production cluster, rolling out the new stable release.
