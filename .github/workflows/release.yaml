@@ -25,7 +25,7 @@ jobs:
         run: echo $VERSION > version.txt
 
       - name: Update image tags to release
-        run: ./update-image-tags.py $VERSION
+        run: ./scripts/update-image-tags.py $VERSION
 
       - name: Configure git
         run: |
