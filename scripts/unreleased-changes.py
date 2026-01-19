@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import requests
+import os
 from datetime import datetime
 
 """
@@ -18,10 +21,20 @@ REPOS = [
 
 GITHUB_API = "https://api.github.com"
 
+
+def github_get(url):
+    headers = {}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"token {token}"
+    resp = requests.get(url, headers=headers)
+    resp.raise_for_status()
+    return resp
+
+
 def get_latest_release_tag(repo):
     url = f"{GITHUB_API}/repos/{repo}/tags"
-    resp = requests.get(url)
-    resp.raise_for_status()
+    resp = github_get(url)
     tags = [tag['name'] for tag in resp.json()]
     # Filter tags that look like CalVer (YYYY.MM.DD)
     calver_tags = [t for t in tags if len(t) == 10 and t[:4].isdigit() and t[5:7].isdigit() and t[8:10].isdigit()]
@@ -35,24 +48,20 @@ def get_unreleased_commits(repo, latest_tag):
     # Get the SHA of the latest tag
     if latest_tag:
         tag_url = f"{GITHUB_API}/repos/{repo}/git/refs/tags/{latest_tag}"
-        tag_resp = requests.get(tag_url)
+        tag_resp = github_get(tag_url)
         if tag_resp.status_code != 200:
             return "Could not find tag ref."
         tag_obj = tag_resp.json()['object']
         # If tag is annotated, dereference to the commit
         if tag_obj['type'] == 'tag':
             annotated_tag_url = tag_obj['url']
-            annotated_tag_resp = requests.get(annotated_tag_url)
-            annotated_tag_resp.raise_for_status()
+            annotated_tag_resp = github_get(annotated_tag_url)
             tag_sha = annotated_tag_resp.json()['object']['sha']
         else:
             tag_sha = tag_obj['sha']
         # Get parent commit of the tag commit
-        # We need the parent commit because the latest commit on release tags
-        # does increase the version number and is not found on the main branch
         commit_url = f"{GITHUB_API}/repos/{repo}/commits/{tag_sha}"
-        commit_resp = requests.get(commit_url)
-        commit_resp.raise_for_status()
+        commit_resp = github_get(commit_url)
         parents = commit_resp.json().get('parents', [])
         if parents:
             tag_parent_sha = parents[0]['sha']
@@ -63,8 +72,7 @@ def get_unreleased_commits(repo, latest_tag):
 
     # Get commits on main
     commits_url = f"{GITHUB_API}/repos/{repo}/commits?sha=main"
-    commits_resp = requests.get(commits_url)
-    commits_resp.raise_for_status()
+    commits_resp = github_get(commits_url)
     commits = commits_resp.json()
 
     unreleased = []
