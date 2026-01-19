@@ -27,13 +27,22 @@ The backend service. It exposes an HTTP API to read data from the database and a
 
 Provides the GLVD CLI client packaged for the Garden Linux APT repository.
 
+### [`gardenlinux/glvd-contrib`](https://github.com/gardenlinux/glvd-contrib)
+
+glvd-contrib contains experimental code that is not part of the glvd product.
+Nothing in here should be vital to glvd operations or development, but it might contain useful bits.
+
 ## Setup a Local Dev Env
 
 ### On macOS — using Podman (Desktop / Machine)
 
 Prerequisites
 - Install Podman (podman.io). If using Podman Machine, run `podman machine init` and `podman machine start`.
-- Download a compatible docker-compose (Compose v2) CLI and put it in your PATH. This lets Podman reuse it for Compose files.
+- Download a compatible [docker-compose (Compose v2 or later) CLI](podman compose --file deployment/compose/compose.yaml up) and put it in your PATH. This lets Podman reuse it for Compose files.
+
+> [!WARNING]  
+> Don't skip the setup of docker-compose (Compose v2 or later).
+> The default 'compose' implementation in Podman is not good enough to run GLVD.
 
 How Podman Compose works
 - By default `podman compose` uses the provider containers/podman-compose, which (as of Dec 2024) lacks some features GLVD needs.
