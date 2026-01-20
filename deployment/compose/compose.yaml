@@ -1,6 +1,6 @@
 services:
   glvd-postgres:
-    image: ghcr.io/gardenlinux/glvd-postgres:latest
+    image: ghcr.io/gardenlinux/glvd-postgres:2026.01.20
     hostname: glvd-postgres
     networks:
       - glvd
@@ -20,7 +20,7 @@ services:
       timeout: 10s
 
   glvd-init:
-    image: ghcr.io/gardenlinux/glvd-init:latest
+    image: ghcr.io/gardenlinux/glvd-init:2026.01.20
     networks:
       - glvd
     depends_on:
@@ -32,7 +32,7 @@ services:
 
 
   glvd:
-    image: ghcr.io/gardenlinux/glvd-api:latest
+    image: ghcr.io/gardenlinux/glvd-api:2026.01.20
     hostname: glvd
     networks:
       - glvd
