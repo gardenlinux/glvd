@@ -2,10 +2,10 @@
 
 import sys
 import re
-import requests
 import subprocess
 import json
 import os
+import urllib.request
 
 """
 Script to check for consistency of glvd releases.
@@ -26,8 +26,6 @@ IMAGE_TEMPLATES = [
 ]
 
 GITHUB_API = "https://api.github.com/repos/{repo}/tags"
-DOCKER_REGISTRY_API = "https://ghcr.io/v2/{image}/manifests/{tag}"
-
 CALVER_REGEX = re.compile(r"^\d{4}.\d{2}.\d{2}$")
 
 
@@ -36,19 +34,24 @@ def github_get(url):
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         headers["Authorization"] = f"token {token}"
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    return resp
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            if resp.status != 200:
+                raise Exception(f"HTTP {resp.status}")
+            return resp.read().decode()
+    except Exception as e:
+        print(f"Failed to fetch {url}: {e}")
+        sys.exit(1)
 
 
 def get_latest_calver_tag(repo):
     url = GITHUB_API.format(repo=repo)
-    resp = github_get(url)
-    tags = resp.json()
+    resp_text = github_get(url)
+    tags = json.loads(resp_text)
     calver_tags = [tag['name'] for tag in tags if CALVER_REGEX.match(tag['name'])]
     if not calver_tags:
         return None
-    # Sort descending, latest first
     calver_tags.sort(reverse=True)
     return calver_tags[0]
 
@@ -56,7 +59,6 @@ def all_repos_same_tag(tags):
     return all(tag == tags[0] for tag in tags)
 
 def docker_image_tag_exists(image, tag):
-    # Use oras to fetch the manifest
     try:
         result = subprocess.run(
             ["oras", "manifest", "fetch", f"{image}:{tag}"],
@@ -69,7 +71,6 @@ def docker_image_tag_exists(image, tag):
         print(f"Failed to fetch manifest for {image}:{tag}: {e}")
         return False
 
-    # Check for both amd64 and arm64 platforms in the manifest
     manifests = manifest.get("manifests", [])
     platforms = {m.get("platform", {}).get("architecture") for m in manifests if "platform" in m}
     return "amd64" in platforms and "arm64" in platforms
@@ -95,16 +96,14 @@ def main():
         version = tags[0]
         print(f"Using latest calver tag: {version}")
 
-    # Check all repos have this tag
     for repo in REPOS:
         url = GITHUB_API.format(repo=repo)
-        resp = github_get(url)
-        tags = [tag['name'] for tag in resp.json()]
+        resp_text = github_get(url)
+        tags = [tag['name'] for tag in json.loads(resp_text)]
         if version not in tags:
             print(f"Repo {repo} does not have tag {version}")
             sys.exit(1)
 
-    # Check all images exist
     all_exist = True
     for tmpl in IMAGE_TEMPLATES:
         image = tmpl.format(version=version)
