@@ -38,6 +38,7 @@ podman run --rm \
   -e PGHOST=glvd-postgres \
   ghcr.io/gardenlinux/glvd-init:latest
 
+# Give init some time to complete
 sleep 15
 
 # Start API
@@ -56,3 +57,4 @@ podman run -d \
   ghcr.io/gardenlinux/glvd-api:latest
 
 echo "GLVD stack started with podman."
+echo "Open http://localhost:8080 to interact with the web ui"

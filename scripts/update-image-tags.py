@@ -45,6 +45,22 @@ def update_deployment_script(release_tag, deploy_script):
             print(f"No changes in {deploy_script}")
 
 
+def update_start_glvd_script(release_tag, script_path):
+    if os.path.exists(script_path):
+        with open(script_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        # Replace :latest with :<release_tag> in image references
+        new_content, count = re.subn(
+            r"(ghcr\.io/gardenlinux/[^:]+):latest\b", r"\1:" + release_tag, content
+        )
+        if count > 0:
+            with open(script_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"Updated {script_path} ({count} replacements)")
+        else:
+            print(f"No changes in {script_path}")
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: {} <release-tag>".format(sys.argv[0]))
@@ -58,6 +74,10 @@ def main():
 
     deploy_script = "deploy-k8s.sh"
     update_deployment_script(release_tag, deploy_script)
+
+    # Update the podman start script as well
+    start_glvd_script = os.path.join("deployment", "podman", "start-glvd.sh")
+    update_start_glvd_script(release_tag, start_glvd_script)
 
     print("Done.")
 
