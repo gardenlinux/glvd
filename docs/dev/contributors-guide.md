@@ -27,6 +27,10 @@ The backend service. It exposes an HTTP API to read data from the database and a
 
 Provides the GLVD CLI client packaged for the Garden Linux APT repository.
 
+### [`gardenlinux/glvd-triage-cli`](https://github.com/gardenlinux/glvd-triage-cli)
+
+A command-line tool for importing triage data into GLVD from YAML files.
+
 ### [`gardenlinux/glvd-contrib`](https://github.com/gardenlinux/glvd-contrib)
 
 glvd-contrib contains experimental code that is not part of the glvd product.
