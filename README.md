@@ -29,6 +29,8 @@ The project is split into dedicated repositories:
     https://github.com/gardenlinux/glvd-api
 - `package-glvd` — Client CLI packaged for Garden Linux.  
     https://github.com/gardenlinux/package-glvd
+- `glvd-triage-cli` - CLI for importing triage data from YAML files.
+    https://github.com/gardenlinux/glvd-triage-cli
 
 ## Deployments
 
