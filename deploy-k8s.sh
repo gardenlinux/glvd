@@ -10,6 +10,12 @@ if ! [ -x "$(command -v kubectl)" ]; then
   exit 1
 fi
 
+# Create namespace glvd if it does not exist
+if ! kubectl get namespace glvd &>/dev/null; then
+  echo "Namespace 'glvd' does not exist, creating..."
+  kubectl create namespace glvd
+fi
+
 if kubectl --namespace glvd get secret | grep -q postgres-credentials ; then
     DB_PASSWORD=$(kubectl --namespace glvd get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)
     echo 'found existing db credentials, re-using'
