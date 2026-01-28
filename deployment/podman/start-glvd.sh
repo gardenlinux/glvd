@@ -23,7 +23,7 @@ podman run -d \
   -e POSTGRES_PASSWORD=glvd \
   -v glvd_db_volume:/var/lib/postgresql \
   -p 5432:5432 \
-  ghcr.io/gardenlinux/glvd-postgres:latest
+  ghcr.io/gardenlinux/glvd-postgres:2026.01.28
 
 # Wait for Postgres to be healthy
 echo "Waiting for Postgres to be ready..."
@@ -36,7 +36,7 @@ podman run --rm \
   --name glvd-init \
   --network glvd \
   -e PGHOST=glvd-postgres \
-  ghcr.io/gardenlinux/glvd-init:latest
+  ghcr.io/gardenlinux/glvd-init:2026.01.28
 
 # Give init some time to complete
 sleep 15
@@ -54,7 +54,7 @@ podman run -d \
   -e SPRING_JPA_HIBERNATE_DDLAUTO="none" \
   -e SPRING_SQL_INIT_MODE="never" \
   -p 8080:8080 \
-  ghcr.io/gardenlinux/glvd-api:latest
+  ghcr.io/gardenlinux/glvd-api:2026.01.28
 
 echo "GLVD stack started with podman."
 echo "Open http://localhost:8080 to interact with the web ui"
