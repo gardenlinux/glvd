@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -I
+#!/usr/bin/env python3
 
 import argparse
 import urllib.request
