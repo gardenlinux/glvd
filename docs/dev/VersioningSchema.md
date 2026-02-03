@@ -1,63 +1,56 @@
-# GLVD Versioning Schema
+# GLVD Versioning Schema Reference
 
-## Problem Statement
+This document describes the implemented versioning schema and release process for GLVD deployments.
 
-GLVD is deployed to a Gardener cluster. Until November 2025, there was no versioning in place; all components were always deployed to the latest commit at the same time. Now we want a **stable environment** and a **dev environment**.  
-- The **dev environment** will always use the latest commit.
-- The **stable environment** should use consistent, tested versions.
+## Versioning Scheme
 
-We have the following artifacts that need to be aligned:
-- `ghcr.io/gardenlinux/glvd-init` (DB schema and data dump; must be compatible with the API)
-- `ghcr.io/gardenlinux/glvd-api` (Spring Boot Java backend app)
-- `ghcr.io/gardenlinux/glvd-postgres` (Postgres container with debversion extension)
-- `ghcr.io/gardenlinux/glvd-data-ingestion` (Daily job to import new data, must be compatible with the DB schema and contains DB migrations)
+- **Calendar Versioning (CalVer)** is used for all container images.
+    - Format: `YYYY.MM.DD` (e.g., `2025.11.11`)
+    - Multiple releases per day are not supported, in the worst case, manual intervention would be needed (deleting a previously created git tag/image tag, etc).
+    - All images in a release share the **exact same** CalVer tag.
 
-## Versioning Approach: Calendar Versioning (CalVer)
+## Artifacts
 
-- All images use **CalVer**: `YYYY.MM.DD` (e.g., `2025.11.11`).
-- All images for a given release share the same CalVer tag.
-- If multiple releases happen on the same day, append a counter: `YYYY.MM.DD.N` (e.g., `2025.11.11.2`).
+The following images are versioned and released together:
+- `ghcr.io/gardenlinux/glvd-init` – DB schema and data dump (must match API)
+- `ghcr.io/gardenlinux/glvd-api` – Spring Boot Java backend
+- `ghcr.io/gardenlinux/glvd-postgres` – Postgres with debversion extension
+- `ghcr.io/gardenlinux/glvd-data-ingestion` – Data import job (includes DB migrations)
 
-## Release Process
+## Release Workflow
 
-1. **Component Release Workflows**  
-    - In each individual component repository, a `release` workflow is triggered (manually or via automation).
-    - Each repository creates a new release, building and pushing its image with a CalVer tag (e.g., `2025.11.11`).
+See [perform-release.md](../ops/perform-release.md) for detailed instructions.
 
-2. **Central Manifest Update**  
-    - In the central `gardenlinux/glvd` repository, the deployment YAML files (Kubernetes and Docker Compose) are updated to reference the new CalVer-tagged images using the `scripts/update-image-tags.py` script.
+1. **Component Release**
+    - Each component repository triggers a `release` workflow.
+    - Images are built and pushed with the new CalVer tag.
 
-3. **Production Deployment**  
-    - The updated deployment manifests are applied to the production cluster, rolling out the new stable release.
+2. **Central Manifest Update**
+    - The central `gardenlinux/glvd` repository updates deployment manifests (Kubernetes, Docker Compose) to reference the new CalVer tags using `scripts/update-image-tags.py`.
 
-4. **Database Schema Versioning & Migration**  
-    - Each GLVD release specifies the required database schema version in the manifest.
-    - Database migrations are managed as part of the release process: the appropriate migration scripts are applied automatically before deploying the new application version, ensuring compatibility between the API and the database schema.
+3. **Production Deployment**
+    - Updated manifests are applied to the production cluster, rolling out the new stable release.
 
-5. **Dev Environment**  
-    - The dev environment continues to use `:latest` or a `dev` tag, built from the default branch of each repo.
+4. **Database Schema Versioning & Migration**
+    - Each release specifies the required DB schema version in the manifest.
+    - Migration scripts are applied automatically before deploying the new application version.
 
-This process ensures coordinated releases, consistent deployments, and automated handling of database schema changes.
+5. **Dev Environment**
+    - The dev environment uses `:latest` tag, built and updated on each push to the `main` branch
 
 ## Handling Breaking Changes
 
-- If a breaking change is required, it will be clearly communicated in release notes and documentation.
-- Optionally, a suffix (e.g., `2025.11.11-bc1`) can be used for breaking changes, but generally, communication is preferred over encoding this in the version.
+- There is no way to indicate breaking changes as there is in SemVer
+- Breaking changes are to be avoided
 
 ## Rollback
 
 - Previous stable versions remain available via their CalVer tags.
-- Rollback is as simple as redeploying manifests with the previous version.
+- Rollback is performed by redeploying manifests with the previous version.
 
-## Summary Table
+## Environment Reference
 
 | Environment | Image Tag Used   | Source of Truth         |
 |-------------|-----------------|-------------------------|
 | dev         | `:latest`       | Default branch builds   |
 | stable      | `YYYY.MM.DD`    | Release repo manifest   |
-
-## Automation Recommendations
-
-- Use GitHub Actions for all build, tag, and publish steps.
-- Use branch protection and required checks in the release repo.
-- Automate manifest updates and release notes generation.
