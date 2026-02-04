@@ -1,0 +1,126 @@
+# ===========================
+# CVEs API
+# ===========================
+
+# Get a list of CVEs for the given Garden Linux version
+GET {{proto}}://{{host}}:{{port}}/v1/cves/1877.10
+
+###
+
+# Get a list of CVEs for a specific Garden Linux image
+GET {{proto}}://{{host}}:{{port}}/v1/cves/1877.10/image/azure-gardener_prod
+
+###
+
+# Get a list of CVEs for a list of packages in a given Garden Linux version
+GET {{proto}}://{{host}}:{{port}}/v1/cves/1877.10/packages/jinja2,rsync
+
+###
+
+# Get a list of CVEs for a list of packages (using PUT)
+PUT {{proto}}://{{host}}:{{port}}/v1/cves/1877.10/packages
+Content-Type: application/json
+
+{
+  "packageNames": ["jinja2", "rsync"]
+}
+
+###
+
+# ===========================
+# Packages API
+# ===========================
+
+# Get a list of CVEs for the given source package
+GET {{proto}}://{{host}}:{{port}}/v1/packages/jinja2
+
+###
+
+# Get a list of CVEs for the given source package and version
+GET {{proto}}://{{host}}:{{port}}/v1/packages/jinja2/3.1.3-1
+
+###
+
+# ===========================
+# Distro API
+# ===========================
+
+# Retrieve a list of packages for a given Garden Linux version
+GET {{proto}}://{{host}}:{{port}}/v1/distro/1877.10?sortBy=sourcePackageName&sortOrder=ASC&pageNumber=1&pageSize=2
+
+###
+
+# Retrieve a list of packages affected by a specific CVE in a given Garden Linux version
+GET {{proto}}://{{host}}:{{port}}/v1/distro/1877.10/CVE-2015-0235
+
+###
+
+# Internal API: Get the distId for a given Garden Linux version (for triage implementation, not for external use)
+GET {{proto}}://{{host}}:{{port}}/v1/distro/1877.10/distId
+
+###
+
+# ===========================
+# Garden Linux Versions API
+# ===========================
+
+# List all Garden Linux versions known and supported by GLVD
+GET {{proto}}://{{host}}:{{port}}/v1/gardenlinuxVersions
+
+###
+
+# ===========================
+# CVE Details API
+# ===========================
+
+# Get all information known in GLVD for this specific CVE, aggregated from all data sources
+GET {{proto}}://{{host}}:{{port}}/v1/cveDetails/CVE-2024-56326
+
+###
+
+# ===========================
+# Release Notes APIs
+# ===========================
+
+# (Deprecated) Old API used for Release Notes page
+GET {{proto}}://{{host}}:{{port}}/v1/patchReleaseNotes/1877.10
+
+###
+
+# New API: Used in Release Notes generation, compares the given Garden Linux minor version to the previous minor version to list resolved CVEs
+GET {{proto}}://{{host}}:{{port}}/v1/releaseNotes/1877.10
+
+###
+
+# ===========================
+# Kernel CVEs API
+# ===========================
+
+# Get only the kernel-related CVEs for this Garden Linux version (not intended for end-users)
+GET {{proto}}://{{host}}:{{port}}/v1/kernel/gardenlinux/1877.10
+
+###
+
+# ===========================
+# Triage API
+# ===========================
+
+# Get triage data for the given Garden Linux version
+GET {{proto}}://{{host}}:{{port}}/v1/triage/gardenlinux/1877.7
+
+###
+
+# Get triage data for the given CVE
+GET {{proto}}://{{host}}:{{port}}/v1/triage/cve/CVE-2024-0565
+
+###
+
+# Get triage data for the given source package
+GET {{proto}}://{{host}}:{{port}}/v1/triage/sourcePackage/cloud-init
+
+###
+
+# Get all triage data known to GLVD
+GET {{proto}}://{{host}}:{{port}}/v1/triage
+
+###

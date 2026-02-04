@@ -2,5 +2,22 @@
     "cSpell.words": [
         "gardenlinux",
         "glvd"
-    ]
+    ],
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "proto": "http",
+            "host": "localhost",
+            "port": "8080"
+        },
+        "dev": {
+            "proto": "https",
+            "host": "security.dev.gardenlinux.org",
+            "port": "443"
+        },
+        "live": {
+            "proto": "https",
+            "host": "security.gardenlinux.org",
+            "port": "443"
+        }
+    }
 }
