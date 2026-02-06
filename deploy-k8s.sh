@@ -25,15 +25,6 @@ else
     echo 'did not find existing db credentials, creating new'
 fi
 
-if kubectl --namespace glvd get secret | grep -q pgadmin-credentials ; then
-    PGADMIN_PASSWORD=$(kubectl --namespace glvd get secret/pgadmin-credentials --template="{{.data.password}}" | base64 -d)
-    echo 'found existing pgadmin credentials, re-using'
-else
-    PGADMIN_PASSWORD=$(pwgen 42 1)
-    kubectl --namespace glvd create secret generic pgadmin-credentials --type=string --from-literal=password="$PGADMIN_PASSWORD"
-    echo 'did not find existing pgadmin credentials, creating new'
-fi
-
 kubectl --namespace glvd apply -f deployment/k8s/00_db-statefulset.yaml
 
 echo 'give db some time to pull image and start'
