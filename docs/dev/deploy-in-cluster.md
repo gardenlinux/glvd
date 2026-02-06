@@ -10,8 +10,30 @@ Once deployed, you can access the application by configuring an ingress or by us
 
 Example to forward the port 8080 to the service:
 
-```
+```bash
 kubectl -n glvd port-forward service/glvd 8080
 ```
 
 Now, you can access your deployment via http://localhost:8080
+
+In a similar way, you can get access to the DB using a local client.
+
+Forward the port:
+
+```bash
+kubectl -n glvd port-forward service/glvd-database 5432
+```
+
+Get the (auto-generated) password:
+
+```bash
+kubectl --namespace glvd get secret/postgres-credentials --template="{{.data.password}}" | base64 -d
+```
+
+Connect your client to the db with these parameters:
+
+- host=localhost
+- port=5432
+- dbname=glvd
+- user=glvd
+- password=(the value you got above)
