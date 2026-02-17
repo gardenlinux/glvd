@@ -42,7 +42,7 @@ Nothing in here should be vital to glvd operations or development, but it might 
 
 Prerequisites
 - Install Podman (podman.io). If using Podman Machine, run `podman machine init` and `podman machine start`.
-- Download a compatible [docker-compose (Compose v2 or later) CLI](podman compose --file deployment/compose/compose.yaml up) and put it in your PATH. This lets Podman reuse it for Compose files.
+- Download a compatible [docker-compose (Compose v2 or later) CLI](https://github.com/docker/compose/releases) and put it in your PATH. This lets Podman reuse it for Compose files.
 
 > [!WARNING]  
 > Don't skip the setup of docker-compose (Compose v2 or later).
