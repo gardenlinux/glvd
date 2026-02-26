@@ -45,7 +45,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: data-ingestion
-            image: ghcr.io/gardenlinux/glvd-data-ingestion:latest
+            image: ghcr.io/gardenlinux/glvd-data-ingestion:2026.02.26
             # resources:
             #   requests:
             #     cpu: "1"
