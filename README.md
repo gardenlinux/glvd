@@ -45,8 +45,11 @@ Operational tips
 - Ensure Postgres persistence is configured before production use.
 - Use the ingestion component to keep vulnerability data up to date (scheduled runs recommended).
 
-## Contributing & license
+## Contributing
 Contributions, bug reports and pull requests are welcome — open issues or PRs on the GitHub organization repositories. See the repository for contribution guidelines, code of conduct and license details.
 
+## Licensing
 Copyright © 2025 The Linux Foundation Europe. All rights reserved.
 Garden Linux Vulnerability Database is a project of NeoNephos Foundation. For applicable policies including privacy policy, terms of use and trademark usage guidelines, please see [linuxfoundation.eu](https://linuxfoundation.eu/).
+
+<p align="center"><img alt="Bundesministerium für Wirtschaft und Energie (BMWE)-EU funding logo" src="https://apeirora.eu/assets/img/BMWK-EU.png" width="400"/></p>
