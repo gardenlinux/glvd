@@ -1,6 +1,11 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Deploy and test the application before making the release'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -40,18 +45,22 @@ jobs:
           git tag $VERSION
 
       - name: Setup Node.js
+        if: ${{ inputs.run_tests == true }}
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: '24'
 
       - name: Install Bruno CLI
+        if: ${{ inputs.run_tests == true }}
         run: npm install -g @usebruno/cli
 
       - name: Compose Up
+        if: ${{ inputs.run_tests == true }}
         run: |
           docker compose --file deployment/compose/compose.yaml up --detach
 
       - name: Wait for GLVD to be up
+        if: ${{ inputs.run_tests == true }}
         run: |
           # Wait for HTTP 200 and status: UP in response body
           until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)" = "200" ] && \
@@ -59,13 +68,17 @@ jobs:
             sleep 1
           done
 
-      - run: docker ps
+      - name: docker overview
+        if: ${{ inputs.run_tests == true }}
+        run: docker ps
 
       - name: Run API Tests
+        if: ${{ inputs.run_tests == true }}
         run: bru run --env ci --reporter-html results.html
         working-directory: api-tests
 
       - name: Upload Test Results
+        if: ${{ inputs.run_tests == true }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test-results
