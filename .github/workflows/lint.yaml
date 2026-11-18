@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: azure/k8s-lint@e4234c50ea835112e72b145bdecd00a94bad42fd # v4.0.0
+      - uses: azure/k8s-lint@6a0796029c4d61b43d9e229a6e39c9897a9fb558 # v4.1.0
         with:
            manifests: |
               deployment/k8s
